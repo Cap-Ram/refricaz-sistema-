@@ -1,0 +1,6 @@
+2026/06/15-13:33:47.389 5448 Reusing MANIFEST C:\Users\USUARIO\Desktop\proyecto-refricaz\.vscode\msedge-debug-profile\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/06/15-13:33:47.408 5448 Recovering log #10
+2026/06/15-13:33:47.410 5448 Reusing old log C:\Users\USUARIO\Desktop\proyecto-refricaz\.vscode\msedge-debug-profile\Default\EdgeCoupons/coupons_data.db/000010.log 
+2026/06/15-13:33:47.486 3c04 Level-0 table #14: started
+2026/06/15-13:33:47.493 3c04 Level-0 table #14: 682844 bytes OK
+2026/06/15-13:33:47.497 3c04 Delete type=0 #10

@@ -1,0 +1,53 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Servidor local Refricaz",
+            "type": "shell",
+            "command": "C:\\Users\\USUARIO\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+            "args": [
+                "${workspaceFolder}\\tools\\local-server.js"
+            ],
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "refricaz-server",
+                "pattern": {
+                    "regexp": "."
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".*",
+                    "endsPattern": "Servidor Refricaz activo.*"
+                }
+            }
+        },
+        {
+            "label": "Abrir sitio Refricaz",
+            "type": "shell",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "Start-Process 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe' 'http://127.0.0.1:5600/index.html'"
+            ],
+            "dependsOn": "Servidor local Refricaz",
+            "problemMatcher": []
+        },
+        {
+            "label": "Abrir panel Admin",
+            "type": "shell",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "Start-Process 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe' 'http://127.0.0.1:5600/admin.html'"
+            ],
+            "dependsOn": "Servidor local Refricaz",
+            "problemMatcher": []
+        }
+    ]
+}

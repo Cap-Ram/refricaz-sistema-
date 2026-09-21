@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "msedge",
+            "request": "launch",
+            "name": "Abrir sitio Refricaz",
+            "url": "http://127.0.0.1:5600/index.html",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "Servidor local Refricaz",
+            "userDataDir": "${workspaceFolder}\\.vscode\\msedge-debug-profile"
+        },
+        {
+            "type": "msedge",
+            "request": "launch",
+            "name": "Abrir panel Admin",
+            "url": "http://127.0.0.1:5600/admin.html",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "Servidor local Refricaz",
+            "userDataDir": "${workspaceFolder}\\.vscode\\msedge-debug-profile"
+        }
+    ]
+}

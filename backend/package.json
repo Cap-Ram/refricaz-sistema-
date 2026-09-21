@@ -1,0 +1,10 @@
+{
+  "name": "refricaz-backend-fase1",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Servidor base de REFRICAZ para la Fase 1 de Servicios Web",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function bootstrapAdmin() {
+      return signedIn()
+        && request.auth.token.email in [
+          "ali.ramses.perez.martinez@gmail.com"
+        ];
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isAdmin());
+
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.email == request.auth.token.email
+        && (
+          request.resource.data.role == "user"
+          || (request.resource.data.role == "admin" && bootstrapAdmin())
+        );
+
+      allow update: if isAdmin()
+        || (
+          bootstrapAdmin()
+          && request.auth.uid == userId
+          && request.resource.data.email == resource.data.email
+          && request.resource.data.role == "admin"
+        )
+        || (
+          signedIn()
+          && request.auth.uid == userId
+          && request.resource.data.role == resource.data.role
+        );
+
+      allow delete: if isAdmin() && request.auth.uid != userId;
+    }
+
+    match /leads/{leadId} {
+      allow create: if request.resource.data.origen is string
+        && request.resource.data.createdAt is string;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /comments/{commentId} {
+      allow read: if resource.data.hidden == false || isAdmin();
+
+      allow create: if signedIn()
+        && request.auth.uid == request.resource.data.userId
+        && request.resource.data.usuario is string
+        && request.resource.data.texto is string
+        && request.resource.data.estrellas is int
+        && request.resource.data.estrellas >= 1
+        && request.resource.data.estrellas <= 5
+        && request.resource.data.hidden == false;
+
+      allow update, delete: if isAdmin();
+    }
+
+    match /siteConfig/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

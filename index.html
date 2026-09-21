@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REFRICAZ | Servicios de Línea Blanca</title>
+    
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f4c81">
+    
+    <meta name="description" content="Servicio técnico especializado Refricaz. Reparación e instalación de línea blanca en refrigeradores, lavadoras y microondas.">
+    <meta name="keywords" content="reparación, refrigeradores, cámaras de refrigeración, lavadoras, línea blanca, servicio técnico, Refricaz">
+    <meta name="author" content="Ai Ramses Perez Martinez">
+    <link rel="stylesheet" href="style.css?v=16">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <img src="img/logo-azul.png" class="brand-logo-img" alt="REFRICAZ">
+        </div>
+        
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú de navegación">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        
+        <nav id="navMenu">
+            <a href="#inicio" class="active">Inicio</a> 
+            <a href="#ofertas">Ofertas</a>
+            <a href="#servicios">Servicios</a>
+            <a href="#historial">Historial</a>
+            <a href="#faq">Preguntas Frecuentes</a>
+            <a href="#contacto" class="btn-contacto">Contactar</a>
+            <button type="button" class="account-link" id="accountNavBtn">Iniciar sesión</button>
+            <a href="admin.html" class="admin-link" id="adminNavLink">Panel Admin</a>
+        </nav>
+    </header>
+
+    <section id="inicio" class="hero">
+        <div class="hero-content">
+            <h1>Especialistas en Reparación y Mantenimiento de Línea Blanca</h1>
+            <p>Más de 20 años de experiencia respaldan nuestro servicio técnico calificado.</p>
+            <div class="hero-buttons">
+                <button class="btn btn-primary" onclick="abrirModal('Instalación')">
+                    <i class="fa-solid fa-box-open"></i> Solicitar Instalación
+                </button>
+                <button class="btn btn-secondary" onclick="abrirModal('Reparación')">
+                    <i class="fa-solid fa-gears"></i> Solicitar Reparación
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="quick-contact-section">
+        <div class="quick-contact-container">
+            <a href="tel:5512728352" class="channel-card" id="link-telefono-rapido">
+                <i class="fa-solid fa-phone channel-icon"></i>
+                <div>
+                    <h4>Línea Telefónica</h4>
+                    <p id="texto-telefono-rapido">Llamar a central</p>
+                </div>
+            </a>
+            <a href="https://wa.me/525512728352" class="channel-card" target="_blank" rel="noopener" id="link-whatsapp-rapido">
+                <i class="fa-brands fa-whatsapp channel-icon whatsapp-color"></i>
+                <div>
+                    <h4>WhatsApp</h4>
+                    <p id="texto-whatsapp-rapido">Chat de atención central</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <section id="nosotros" class="about-section scroll-animate">
+        <div class="about-container">
+            <div class="about-text">
+                <span class="badge">Nuestra Historia</span>
+                <h2>Más de 20 Años de Experiencia Nos Avalan</h2>
+                <p>En <strong>REFRICAZ</strong> nos respaldan más de 20 años de experiencia, con técnicos altamente certificados para ofrecerte un servicio integral y honesto en la reparación, instalación y mantenimiento de tus equipos de línea blanca.</p>
+                
+                <div class="about-stats">
+                    <div class="stat-item list-animate">
+                        <i class="fa-solid fa-layer-group stat-icon"></i>
+                        <div>
+                            <h3>Piezas Originales</h3>
+                            <p>Garantía de fábrica en cada componente.</p>
+                        </div>
+                    </div>
+                    <div class="stat-item list-animate">
+                        <i class="fa-solid fa-user-check stat-icon"></i>
+                        <div>
+                            <h3>Técnicos Certificados</h3>
+                            <p>Personal experto y calificado.</p>
+                        </div>
+                    </div>
+                    <div class="stat-item list-animate">
+                        <i class="fa-solid fa-file-signature stat-icon"></i>
+                        <div>
+                            <h3>Garantía Por Escrito</h3>
+                            <p>Hasta 2 meses de respaldo total.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="about-image">
+                <div class="image-wrapper">
+                    <img src="img/tecnico.jpg" alt="Técnico Refricaz">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="ofertas" class="offers-section scroll-animate">
+        <h2>Ofertas de Temporada</h2>
+        <div class="seasonal-offer-banner" id="seasonalOfferBanner">
+            <img id="seasonalOfferImage" src="img/refrigerador.png" alt="Promoción Refricaz">
+            <div class="seasonal-offer-copy">
+                <span id="seasonalOfferEyebrow">Promoción vigente</span>
+                <h3 id="seasonalOfferTitle">Diagnóstico con atención preferente</h3>
+                <p id="seasonalOfferDescription">Cotiza tu reparación o mantenimiento con respuesta rápida de un técnico especializado.</p>
+                <div class="seasonal-offer-actions">
+                    <a id="seasonalOfferAction" href="#contacto" class="seasonal-offer-link">
+                        <i class="fa-solid fa-calendar-check"></i> Solicitar ahora
+                    </a>
+                    <a id="seasonalOfferWhatsApp" href="https://wa.me/525512728352" class="seasonal-offer-link seasonal-offer-whatsapp" target="_blank" rel="noopener">
+                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="offers-grid" id="offersCardsGrid">
+            <div class="card card-animate" data-default-offer-card>
+                <div class="card-icon"><i class="fa-solid fa-percent"></i></div>
+                <h3 id="monthlyOfferTitle">Revisión con respuesta rápida</h3>
+                <p id="monthlyOfferDescription">Agenda tu diagnóstico para refrigeradores, lavadoras, secadoras y cámaras de refrigeración.</p>
+            </div>
+            <div class="card card-animate" data-default-offer-card>
+                <div class="card-icon"><i class="fa-solid fa-bolt"></i></div>
+                <h3>Servicio Express</h3>
+                <p>Atención inmediata para emergencias en tu hogar.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="servicios" class="services-section scroll-animate">
+        <h2>Nuestros Servicios Especializados</h2>
+        <p class="subtitle">Especialistas en Reparación, Instalación y Mantenimiento de Línea Blanca</p>
+        
+        <div class="services-container">
+            <div class="service-box">
+                <div class="service-main">
+                    <img src="img/lavadora.png" class="icon-appliance-img" alt="Lavadoras">
+                    <h3>Lavadoras</h3>
+                </div>
+                <div class="service-details">
+                    <ul>
+                        <li>Transmisiones, bombas de agua y tarjetas electronicas.</li>
+                        <li>Mantenimiento preventivo para ciclos, fugas y malos olores.</li>
+                        <li>Prueba final de carga, drenado y centrifugado.</li>
+                    </ul>
+                    <a href="https://wa.me/525512728352" class="service-detail-link service-whatsapp-link" data-service-name="Lavadoras" target="_blank" rel="noopener">
+                        <i class="fa-brands fa-whatsapp"></i> Agendar por WhatsApp
+                    </a>
+                    <p>Reparación de transmisiones, bombas de agua, tarjetas electrónicas y mantenimiento preventivo para evitar malos olores.</p>
+                </div>
+            </div>
+
+            <div class="service-box">
+                <div class="service-main">
+                    <img src="img/refrigerador.png" class="icon-appliance-img" alt="Refrigeradores">
+                    <h3>Refrigeradores</h3>
+                </div>
+                <div class="service-details">
+                    <ul>
+                        <li>Diagnostico de enfriamiento, sensores y termostatos.</li>
+                        <li>Carga de gas, fugas y sistema de compresor.</li>
+                        <li>Limpieza tecnica para recuperar rendimiento.</li>
+                    </ul>
+                    <a href="https://wa.me/525512728352" class="service-detail-link service-whatsapp-link" data-service-name="Refrigeradores" target="_blank" rel="noopener">
+                        <i class="fa-brands fa-whatsapp"></i> Agendar por WhatsApp
+                    </a>
+                    <p>Solución a problemas de enfriamiento, carga de gas refrigerante, cambio de sensores y reparación de compresores.</p>
+                </div>
+            </div>
+
+            <div class="service-box">
+                <div class="service-main">
+                    <img src="img/secadora.png" class="icon-appliance-img" alt="Secadoras">
+                    <h3>Secadoras</h3>
+                </div>
+                <div class="service-details">
+                    <ul>
+                        <li>Ductos, bandas, poleas y sensores de seguridad.</li>
+                        <li>Revision de termostatos y calentamiento a gas o electrico.</li>
+                        <li>Prevencion de sobrecalentamiento y baja eficiencia.</li>
+                    </ul>
+                    <a href="https://wa.me/525512728352" class="service-detail-link service-whatsapp-link" data-service-name="Secadoras" target="_blank" rel="noopener">
+                        <i class="fa-brands fa-whatsapp"></i> Agendar por WhatsApp
+                    </a>
+                    <p>Mantenimiento de ductos, cambio de bandas, reparación de termostatos y sistemas de calentamiento (gas o eléctricos).</p>
+                </div>
+            </div>
+
+            <div class="service-box">
+                <div class="service-main">
+                    <img src="img/centro-lavado.png" class="icon-appliance-img" alt="Centros de Lavado">
+                    <h3>Centros de Lavado</h3>
+                </div>
+                <div class="service-details">
+                    <ul>
+                        <li>Servicio integral para equipos combo.</li>
+                        <li>Diagnostico de ciclos de lavado y secado.</li>
+                        <li>Ajuste, prueba y entrega con garantia por escrito.</li>
+                    </ul>
+                    <a href="https://wa.me/525512728352" class="service-detail-link service-whatsapp-link" data-service-name="Centros de Lavado" target="_blank" rel="noopener">
+                        <i class="fa-brands fa-whatsapp"></i> Agendar por WhatsApp
+                    </a>
+                    <p>Servicio integral para equipos combo. Diagnóstico preciso en ciclos de lavado y secado simultáneos.</p>
+                </div>
+            </div>
+
+            <div class="service-box">
+                <div class="service-main">
+                    <img src="img/microondas.png" class="icon-appliance-img" alt="Microondas">
+                    <h3>Microondas</h3>
+                </div>
+                <div class="service-details">
+                    <ul>
+                        <li>Magnetrones, membranas, fusibles y transformadores.</li>
+                        <li>Sistemas de puerta y seguridad electrica.</li>
+                        <li>Revision de calentamiento y tablero de control.</li>
+                    </ul>
+                    <a href="https://wa.me/525512728352" class="service-detail-link service-whatsapp-link" data-service-name="Microondas" target="_blank" rel="noopener">
+                        <i class="fa-brands fa-whatsapp"></i> Agendar por WhatsApp
+                    </a>
+                    <p>Reparación de magnetrones, cambios de membrana táctil, transformadores y sistemas de seguridad de puerta.</p>
+                </div>
+            </div>
+
+            <div class="service-box">
+                <div class="service-main">
+                    <i class="fa-solid fa-snowflake icon-service-fa" aria-hidden="true"></i>
+                    <h3>Cámaras de Refrigeración</h3>
+                </div>
+                <div class="service-details">
+                    <p>Atendemos cámaras de refrigeración con diagnóstico de temperatura, evaporadores, condensadores, puertas, controles y mantenimiento preventivo.</p>
+                </div>
+            </div>
+        </div>  
+    </section>
+
+    <section id="protocolos" class="protocols-section scroll-animate">
+        <div class="protocols-container">
+            <div class="protocol-card">
+                <div class="protocol-text">
+                    <span class="protocol-badge">Atención Directa</span>
+                    <h2>Servicio Técnico</h2>
+                    <p>Permite que uno de nuestros técnicos especializados te brinde una asesoría integral para poder resolver el problema de tu equipo de forma rápida y eficiente.</p>
+                    <div class="protocol-highlight">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Contamos con todas nuestras refacciones originales y garantías por escrito hasta por 2 meses.</span>
+                    </div>
+                </div>
+                <div class="protocol-image">
+                     <img src="img/lavadora.jpg" alt="Centro de lavado moderno">
+                </div>
+            </div>  
+            <div class="protocol-card inverted">
+                <div class="protocol-image">
+                    <img src="img/ingenieros.jpg" alt="Mantenimiento técnico especializado">
+                </div>
+                <div class="protocol-text">
+                    <span class="protocol-badge orange">Estándar de Fábrica</span>
+                    <h2>Servicio Técnico Especializado</h2>
+                    <p>Contamos con la autorización de las marcas para realizar las reparaciones correspondientes, asegurando el respaldo total en cada intervención.</p>
+                    <div class="protocol-highlight">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                        <span>Todo bajo un estricto protocolo diseñado por nuestra empresa para satisfacer las necesidades de los clientes y apegados a las especificaciones del fabricante.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="garantia" class="warranty-section scroll-animate">
+        <div class="warranty-grid">
+            <div class="warranty-card active-trigger">
+                <div class="warranty-icon"><i class="fa-solid fa-file-signature"></i></div>
+                <h3>Garantía por Escrito</h3>
+                <p>Todos nuestros trabajos de reparación y mantenimiento cuentan con una garantía respaldada por escrito de hasta 2 meses.</p>
+            </div>
+            <div class="warranty-card active-trigger">
+                <div class="warranty-icon"><i class="fa-solid fa-layer-group"></i></div>
+                <h3>Refacciones Originales</h3>
+                <p>Utilizamos exclusivamente piezas nuevas y componentes originales de fábrica para asegurar el rendimiento óptimo de tu equipo.</p>
+            </div>
+            <div class="warranty-card active-trigger">
+                <div class="warranty-icon"><i class="fa-solid fa-user-check"></i></div>
+                <h3>Técnicos Certificados</h3>
+                <p>Nuestro personal está altamente calificado y en constante capacitación técnica para resolver cualquier falla.</p>
+            </div>
+            <div class="warranty-card active-trigger">
+                <div class="warranty-icon"><i class="fa-solid fa-award"></i></div>
+                <h3>Servicio Garantizado</h3>
+                <p>Tu satisfacción es nuestra prioridad absoluta. Ofrecemos un soporte post-venta inmediato para cualquier aclaración o revisión sin costo extra.</p>
+            </div>
+        </div>        
+    </section>
+    
+    <section id="marcas" class="brands-section scroll-animate">
+        <div class="brands-container">
+            <p class="brands-subtitle">SOPORTE TÉCNICO MULTIMARCA ESPECIALIZADO</p>
+            <h2>Marcas que Atendemos</h2>
+            <div class="brands-grid">
+                <div class="brand-item"><img src="img/logo-whirlpool.png" alt="Whirlpool"></div>
+                <div class="brand-item"><img src="img/logo-maytag.png" alt="Maytag"></div>
+                <div class="brand-item"><img src="img/logo-mabe.png" alt="Mabe"></div>
+                <div class="brand-item"><img src="img/logo-ge.png" alt="General Electric"></div>
+                <div class="brand-item"><img src="img/logo-samsung.png" alt="Samsung"></div>
+                <div class="brand-item"><img src="img/logo-lg.png" alt="LG"></div>
+                <div class="brand-item"><img src="img/logo-subzero.png" alt="Sub-Zero"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="historial" class="service-history-section scroll-animate">
+        <div class="history-container">
+            <div class="history-header">
+                <span class="badge-blue">Historial de Servicios</span>
+                <h2>Antes y Después de Nuestro Trabajo</h2>
+                <p>Revisa algunos equipos atendidos por el equipo técnico de REFRICAZ.</p>
+            </div>
+
+            <div class="history-carousel" aria-label="Historial de trabajos Refricaz">
+                <button type="button" class="history-arrow history-prev" id="historyPrev" aria-label="Trabajo anterior">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="history-viewport">
+                    <div class="history-track" id="serviceHistoryTrack"></div>
+                </div>
+                <button type="button" class="history-arrow history-next" id="historyNext" aria-label="Trabajo siguiente">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="history-dots" id="serviceHistoryDots" aria-label="Selector de trabajos"></div>
+        </div>
+    </section>
+
+    <div id="historyLightbox" class="history-lightbox" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="historyLightboxCaption">
+        <button type="button" class="history-lightbox-close" id="historyLightboxClose" aria-label="Cerrar imagen ampliada">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="history-lightbox-inner">
+            <img id="historyLightboxImage" src="" alt="">
+            <p id="historyLightboxCaption">Imagen del servicio</p>
+        </div>
+    </div>
+
+    <section id="testimonios" class="reviews-section scroll-animate">
+        <div class="reviews-container">
+            <div class="reviews-header">
+                <span class="badge-review">Opiniones Reales</span>
+                <h2>Satisfacción en Cada Servicio</h2>
+                <p>La opinión de nuestros clientes es lo más importante. Conoce lo que dicen sobre nuestra atención y calidad.</p>
+            </div>
+            
+            <div class="reviews-wrapper">
+                <div class="reviews-grid" id="reviewsGrid">
+                    <div class="review-card">
+                        <div class="review-stars">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="review-text">"Excelente servicio con mi lavadora LG. El técnico llegó a tiempo, detectó la falla en la transmisión y la reparó el mismo día usando piezas originales. Muy recomendados."</p>
+                        <div class="review-author"><h4>Carlos Mendoza</h4><span>Cliente Verificado</span></div>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-stars">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="review-text">"Repararon mi refrigerador que ya no enfriaba abajo. Me dieron garantía por escrito y el trato fue sumamente honesto y profesional desde la llamada inicial."</p>
+                        <div class="review-author"><h4>Laura Elena R.</h4><span>Cliente Verificado</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="more-reviews-action">
+                <button id="btnToggleReviews" class="btn-toggle-reviews" onclick="toggleVisibilidadComentarios()">
+                    <i class="fa-solid fa-chevron-down"></i> Ver más opiniones
+                </button>
+            </div>
+
+            <div class="add-review-box">
+                <h3>¿Has contratado nuestro servicio? Déjanos tu opinión</h3>
+                <form id="commentForm" class="comment-form">
+                    <div class="comment-row">
+                        <input type="text" id="commentUser" placeholder="Inicia sesión para publicar" readonly>
+                        <div class="rating-select">
+                            <label for="commentStars">Calificación:</label>
+                            <select id="commentStars" required>
+                                <option value="5">&#9733;&#9733;&#9733;&#9733;&#9733; 5 Estrellas</option>
+                                <option value="4">&#9733;&#9733;&#9733;&#9733; 4 Estrellas</option>
+                                <option value="3">&#9733;&#9733;&#9733; 3 Estrellas</option>
+                            </select>
+                        </div>
+                    </div>
+                    <textarea id="commentText" rows="3" placeholder="Cuéntanos tu experiencia..." required></textarea>
+                    <button type="submit" class="btn-submit-comment">
+                        <i class="fa-solid fa-comment-medical"></i> Publicar Comentario
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="faq-section scroll-animate">
+        <div class="faq-container">
+            <div class="faq-header">
+                <span class="badge-blue">Preguntas Frecuentes</span>
+                <h2>Dudas Comunes Antes de Solicitar Servicio</h2>
+                <p>Resolvemos las preguntas más habituales para que puedas pedir atención con mayor confianza.</p>
+            </div>
+
+            <div class="faq-grid">
+                <details class="faq-item">
+                    <summary>¿Qué equipos de línea blanca atienden?</summary>
+                    <p>Atendemos refrigeradores, cámaras de refrigeración, lavadoras, secadoras, centros de lavado y microondas, tanto para reparación como para mantenimiento e instalación.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Trabajan con marcas como LG, Samsung, Mabe o Whirlpool?</summary>
+                    <p>Sí. Somos servicio técnico multimarca y atendemos equipos LG, Samsung, Mabe, Whirlpool, Maytag, GE, Sub-Zero y otras marcas de línea blanca.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Dan garantía por escrito?</summary>
+                    <p>Sí. Los trabajos realizados cuentan con garantía por escrito de hasta 2 meses, según el tipo de reparación, diagnóstico y refacción instalada.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Usan refacciones originales?</summary>
+                    <p>Trabajamos con refacciones nuevas y originales cuando el equipo y la disponibilidad lo permiten. En cada servicio se informa al cliente antes de realizar la reparación.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿En qué zonas tienen cobertura?</summary>
+                    <p>Tenemos atención en CDMX, Puebla, Querétaro y Guadalajara. Si tu ubicación está fuera de esas regiones, el sistema te canaliza a la línea central.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Atienden emergencias o servicios express?</summary>
+                    <p>Sí. Para fallas urgentes, puedes contactarnos por WhatsApp o llamada directa para revisar disponibilidad de atención inmediata en tu zona.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Cuál es el horario de atención?</summary>
+                    <p>Atendemos de lunes a viernes de 8:00 AM a 20:00 PM, sábados de 8:00 AM a 18:00 PM y domingos de 10:00 AM a 18:00 PM.</p>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Cómo puedo solicitar una cotización?</summary>
+                    <p>Puedes usar el formulario, el chatbot o el botón de WhatsApp. Para una cotización más rápida, comparte ciudad, equipo, marca y descripción de la falla.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <section id="contacto" class="contact-section scroll-animate">
+        <div class="contact-shell">
+        <div class="contact-form-container">
+            <div class="form-header">
+                <span class="badge-blue">Contacto prioritario</span>
+                <h2>Envíanos la descripción de la falla en tu equipo</h2>
+                <p>Déjanos tus datos y un técnico se pondrá en contacto contigo en menos de 30 minutos.</p>
+            </div>
+            <form id="mainContactForm" class="styled-form" action="#contacto" method="POST">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="mainName"><i class="fa-solid fa-user"></i> Nombre Completo</label>
+                        <input type="text" id="mainName" name="Nombre" required placeholder="Ej. Juan Pérez">
+                    </div>
+                    <div class="input-group">
+                        <label for="mainEmail"><i class="fa-solid fa-envelope"></i> Correo Electrónico</label>
+                        <input type="email" id="mainEmail" name="Email" required placeholder="ejemplo@correo.com">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group full-width">
+                        <label for="mainPhone"><i class="fa-solid fa-phone"></i> Teléfono de Contacto</label>
+                        <input type="tel" id="mainPhone" name="Telefono" required placeholder="Ej. 55-1234-5678">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group full-width">
+                        <label for="mainDetail"><i class="fa-solid fa-screwdriver-wrench"></i> Detalle del equipo, marca y falla</label>
+                        <textarea id="mainDetail" name="Mensaje" rows="4" required placeholder="Ej. Lavadora LG..."></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit-form">
+                        <i class="fa-solid fa-paper-plane"></i> ENVIAR SOLICITUD
+                    </button>
+                </div>
+            </form>
+        </div>
+            <div class="contact-media">
+                <img src="img/ingenieros.jpg" alt="Equipo tecnico Refricaz junto a unidad de servicio">
+                <div class="contact-media-card">
+                    <i class="fa-solid fa-shield-heart"></i>
+                    <div>
+                        <strong>Servicio con respaldo</strong>
+                        <span>Atencion tecnica, garantia por escrito y seguimiento real.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="sede-horarios" class="location-hours-section scroll-animate">
+        <div class="section-container">
+            <div class="headquarters-block">
+                <div class="block-header">
+                    <span class="badge-blue">Sede Principal</span>
+                    <h2>Nuestra Ubicación</h2>
+                    <p><i class="fa-solid fa-location-dot"></i> Periférico Boulevard Adolfo López Mateos 1977, Los Alpes, Álvaro Obregón, 01010 Ciudad de México, CDMX</p>
+                </div>
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+            </div>
+            <div class="hours-block">
+                <div class="hours-card">
+                    <div class="hours-header">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <h3>Horarios de Atención</h3>
+                    </div>
+                    <div class="hours-body">
+                        <div class="hours-row" id="row-semana">     
+                            <span class="day">Lunes a Viernes</span>
+                            <span class="time">8:00 AM - 20:00 PM</span>
+                        </div>
+                        <div class="hours-row" id="row-sabado">
+                            <span class="day">Sábado</span>
+                            <span class="time">8:00 AM - 18:00 PM</span>
+                        </div>
+                        <div class="hours-row" id="row-domingo">
+                            <span class="day"><i class="fa-solid fa-calendar-day"></i> Domingo</span>
+                            <span class="time">10:00 AM - 18:00 PM</span>
+                        </div>
+                    </div>
+                    <div class="hours-footer">
+                        <p><i class="fa-solid fa-circle-check"></i> Cobertura en toda la zona metropolitana</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <img src="img/logo-blanco.png" class="footer-logo-img" alt="REFRICAZ">
+            </div>
+            <div class="footer-links">
+                <a href="#politicas" onclick="alert('Aquí se desplegarán las Políticas de Privacidad.')">Políticas De Privacidad</a>
+            </div>
+            <div class="footer-disclaimer">
+                <p><em>Aviso: Somos Un Centro De Servicio Técnico Multimarca Independiente. No Representamos El Servicio Técnico Oficial De Ninguna De Las Marcas Aquí Mencionadas. Los Nombres, Logotipos Y Marcas Son Utilizados Únicamente Con Fines Informativos Y Son Propiedad De Sus Respectivos Dueños.</em></p>
+            </div>
+            <hr class="footer-divider">
+            <div class="footer-rights">
+                <p>&copy; 2026 REFRICAZ. Todos Los Derechos Reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="chatbotContainer" class="chatbot-window minimized">
+        <div class="chatbot-header" onclick="toggleChatbot()">
+            <div class="chatbot-status">
+                <i class="fa-solid fa-robot"></i>
+                <span>Soporte REFRICAZ</span>
+            </div>
+            <i id="chatToggleIcon" class="fa-solid fa-chevron-up"></i>
+        </div>
+        
+        <div id="chatBody" class="chatbot-body">
+            </div>
+
+        <form id="chatInputForm" class="chatbot-input">
+            <div class="input-wrapper">
+                <input type="text" id="chatInputText" placeholder="Escribe tu respuesta aquí..." autocomplete="off">
+                <button type="submit" id="chatSubmitBtn" aria-label="Enviar">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div id="modalServicio" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="cerrarModal()">&times;</span>
+            <h3 id="modalTitle">Agendar Servicio</h3>
+            
+            <form id="appointmentForm" action="#contacto" method="POST">
+                <input type="hidden" id="tipoServicioOculto" name="Tipo_De_Servicio" value="">
+                
+                <div class="form-group">
+                    <label for="name">Nombre Completo:</label>
+                    <input type="text" id="name" name="Nombre" required placeholder="Ej. Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Teléfono:</label>
+                    <input type="tel" id="phone" name="Telefono" required placeholder="55-1234-5678">
+                </div>
+                <div class="form-group">
+                    <label for="desc">Detalle del equipo y falla:</label>
+                    <textarea id="desc" name="Detalle" rows="3" placeholder="Ej. Refrigerador Samsung no enfría"></textarea>
+                </div>
+                <button type="submit" class="btn-submit">Enviar Solicitud</button>
+            </form>
+
+            <div class="modal-divider">
+                <span>O si prefieres atención inmediata</span>
+            </div>
+            <button type="button" class="btn-modal-wa" onclick="enviarWhatsAppDesdeModal()">
+                <i class="fa-brands fa-whatsapp"></i> Enviar mensaje por WhatsApp
+            </button>
+
+        </div>
+    </div>
+
+    <div id="modalExito" class="modal-success-overlay">
+        <div class="modal-success-content">
+            <div class="success-icon animate-pop"><i class="fa-solid fa-circle-check"></i></div>
+            <h2>¡Solicitud Enviada con Éxito!</h2>
+            <p>Hemos recibido tus datos correctamente. Pronto se pondrá en contacto contigo para agendarle su servicio.</p>
+            <button class="btn-success-close" onclick="cerrarModalExito()">Entendido</button>
+        </div>
+    </div>
+
+    <div id="modalCommentSuccess" class="modal-success-overlay">
+        <div class="modal-success-content">
+            <div class="success-icon animate-pop" style="color: var(--secondary-orange);"><i class="fa-solid fa-comment-dots"></i></div>
+            <h2>¡Comentario Publicado!</h2>
+            <p>Agradecemos enormemente tu tiempo. Tu opinión sobre la satisfacción del servicio ha sido registrada correctamente.</p>
+            <button class="btn-success-close" style="background-color: var(--secondary-orange);" onclick="cerrarModalComment()">Entendido</button>
+        </div>
+    </div>
+
+    <div id="modalCuenta" class="modal account-modal">
+        <div class="modal-content account-content">
+            <span class="close-btn" onclick="cerrarModalCuenta()">&times;</span>
+            <h3>Cuenta de usuario</h3>
+            <p class="account-hint" id="accountModalHint">Inicia sesión o crea una cuenta para publicar comentarios.</p>
+
+            <div class="account-tabs">
+                <button type="button" class="account-tab active" data-account-tab="login">Iniciar sesión</button>
+                <button type="button" class="account-tab" data-account-tab="register">Crear cuenta</button>
+            </div>
+
+            <form id="loginForm" class="account-form active">
+                <div class="form-group">
+                    <label for="loginEmail">Correo electrónico:</label>
+                    <input type="email" id="loginEmail" required placeholder="usuario@correo.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña:</label>
+                    <input type="password" id="loginPassword" required placeholder="Tu contraseña">
+                </div>
+                <button type="submit" class="btn-submit">Entrar</button>
+            </form>
+
+            <form id="registerForm" class="account-form">
+                <div class="form-group">
+                    <label for="registerName">Nombre completo:</label>
+                    <input type="text" id="registerName" required placeholder="Ej. Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Correo electrónico:</label>
+                    <input type="email" id="registerEmail" required placeholder="usuario@correo.com">
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Crear contraseña:</label>
+                    <input type="password" id="registerPassword" required minlength="6" placeholder="Mínimo 6 caracteres">
+                </div>
+                <button type="submit" class="btn-submit">Crear cuenta</button>
+            </form>
+
+            <div class="account-session" id="accountSessionBox">
+                <p id="accountSessionText"></p>
+                <button type="button" class="btn-outline-account" id="logoutBtn">Cerrar sesión</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="firebase-client.js?v=5"></script>
+    <script src="script.js?v=12"></script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Qué equipos de línea blanca atienden?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Atendemos refrigeradores, cámaras de refrigeración, lavadoras, secadoras, centros de lavado y microondas, tanto para reparación como para mantenimiento e instalación."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Trabajan con marcas como LG, Samsung, Mabe o Whirlpool?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. Somos servicio técnico multimarca y atendemos equipos LG, Samsung, Mabe, Whirlpool, Maytag, GE, Sub-Zero y otras marcas de línea blanca."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Dan garantía por escrito?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí. Los trabajos realizados cuentan con garantía por escrito de hasta 2 meses, según el tipo de reparación, diagnóstico y refacción instalada."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿En qué zonas tienen cobertura?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Tenemos atención en CDMX, Puebla, Querétaro y Guadalajara. Si tu ubicación está fuera de esas regiones, el sistema te canaliza a la línea central."
+          }
+        }
+      ]
+    }
+    </script>
+</body>
+</html>

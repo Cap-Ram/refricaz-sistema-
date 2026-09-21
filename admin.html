@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REFRICAZ Admin</title>
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --blue: #0f4c81;
+            --blue-2: #08375f;
+            --orange: #f26522;
+            --green: #1f9d55;
+            --red: #c53030;
+            --ink: #243244;
+            --muted: #667085;
+            --line: #e4e7ec;
+            --bg: #f5f7fb;
+            --panel: #ffffff;
+            --shadow: 0 14px 35px rgba(15, 76, 129, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+        body.auth-required .shell { display: none; }
+        body:not(.auth-required) .auth-screen { display: none; }
+        .auth-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(135deg, #eef5fb 0%, #f8fafc 100%); }
+        .auth-card { width: 100%; max-width: 430px; background: white; border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); padding: 28px; animation: fadeUp 0.35s ease both; }
+        .auth-card img { height: 62px; display: block; margin: 0 auto 14px auto; }
+        .auth-card h1 { text-align: center; font-size: 24px; margin-bottom: 8px; }
+        .auth-card p { color: var(--muted); text-align: center; line-height: 1.5; margin: 0 0 20px 0; }
+        .auth-card form { display: grid; gap: 13px; }
+        .auth-actions { display: grid; gap: 10px; margin-top: 4px; }
+        .auth-help { margin-top: 14px; text-align: center; color: var(--muted); font-size: 13px; }
+        .shell { min-height: 100vh; display: grid; grid-template-columns: 260px 1fr; }
+        aside { background: var(--blue-2); color: white; padding: 22px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+        .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .brand img { width: 58px; height: 58px; object-fit: contain; background: white; border-radius: 8px; padding: 6px; }
+        .brand strong { display: block; font-size: 18px; }
+        .brand span, .session small { color: rgba(255,255,255,0.72); font-size: 12px; }
+        .session { padding: 14px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; margin-bottom: 18px; }
+        .session strong { display: block; margin-bottom: 4px; }
+        .nav-tabs { display: grid; gap: 8px; padding: 8px; border-radius: 10px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.11); }
+        .tab-btn { width: 100%; border: 0; background: transparent; color: rgba(255,255,255,0.82); text-align: left; padding: 12px 14px; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.25s ease; justify-content: flex-start; }
+        .tab-btn:hover, .tab-btn.active { background: white; color: var(--blue); transform: translateX(3px); }
+        .side-actions { margin-top: 20px; display: grid; gap: 8px; }
+        .side-actions a, .side-actions button { text-align: center; border: 1px solid rgba(255,255,255,0.22); background: rgba(255,255,255,0.08); color: white; text-decoration: none; padding: 10px 12px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+
+        main { padding: 28px; overflow: hidden; }
+        .topline { display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; margin-bottom: 20px; }
+        h1 { margin: 0 0 6px 0; color: var(--blue); font-size: 30px; }
+        .status { color: var(--muted); font-size: 14px; }
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        select, input, textarea { width: 100%; border: 1px solid var(--line); background: white; border-radius: 8px; padding: 11px 12px; color: var(--ink); font-size: 14px; }
+        textarea { resize: vertical; min-height: 95px; }
+        label { display: grid; gap: 7px; color: var(--muted); font-size: 13px; font-weight: 700; }
+        button, .btn { border: 1px solid var(--line); background: white; color: var(--blue); padding: 10px 14px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: all 0.2s ease; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px; }
+        button:hover, .btn:hover { border-color: var(--blue); transform: translateY(-1px); }
+        .primary { background: var(--blue); color: white; border-color: var(--blue); }
+        .orange { background: var(--orange); color: white; border-color: var(--orange); }
+        .danger { color: var(--red); border-color: rgba(197, 48, 48, 0.25); }
+        .success { color: var(--green); border-color: rgba(31, 157, 85, 0.25); }
+
+        .tab-panel { display: none; animation: fadeUp 0.35s ease both; }
+        .tab-panel.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .metrics { display: grid; grid-template-columns: repeat(5, minmax(145px, 1fr)); gap: 14px; margin-bottom: 18px; }
+        .metric, .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+        .metric { padding: 18px; position: relative; overflow: hidden; }
+        .metric::after { content: ""; position: absolute; right: -24px; top: -24px; width: 86px; height: 86px; border-radius: 50%; background: rgba(242,101,34,0.08); }
+        .metric span { display: block; color: var(--muted); font-size: 13px; margin-bottom: 9px; }
+        .metric strong { font-size: 30px; color: var(--ink); }
+        .grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; margin-bottom: 18px; }
+        .panel { padding: 18px; margin-bottom: 18px; }
+        .panel h2 { margin: 0 0 16px 0; color: var(--blue); font-size: 18px; }
+        .panel canvas { width: 100% !important; height: 275px !important; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 14px; }
+        .full { grid-column: 1 / -1; }
+        .preview { width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; border: 1px solid var(--line); background: #eef2f6; }
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 760px; }
+        th, td { text-align: left; border-bottom: 1px solid var(--line); padding: 12px 13px; vertical-align: top; }
+        th { color: var(--muted); background: #f8fafc; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+        td small { color: var(--muted); display: block; margin-top: 3px; }
+        .tag { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 9px; background: rgba(15, 76, 129, 0.08); color: var(--blue); font-size: 12px; font-weight: 800; }
+        .tag.orange { background: rgba(242, 101, 34, 0.12); color: var(--orange); }
+        .tag.green { background: rgba(31, 157, 85, 0.12); color: var(--green); }
+        .empty { padding: 28px; text-align: center; color: var(--muted); }
+        .notice { position: fixed; right: 24px; bottom: 24px; background: var(--blue); color: white; padding: 14px 16px; border-radius: 8px; box-shadow: var(--shadow); z-index: 20; animation: fadeUp 0.25s ease both; }
+        .muted { color: var(--muted); }
+        .check-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: #f8fafc; color: var(--ink); font-weight: 700; }
+        .check-row input { width: auto; margin-top: 3px; }
+        .offer-admin-layout { display: grid; grid-template-columns: 1fr; gap: 18px; align-items: start; }
+        .offer-admin-layout > div:first-child, .history-admin-form { background: #f8fafc; border: 1px solid var(--line); border-radius: 8px; padding: 16px; }
+        .offer-preview-box { display: grid; gap: 9px; padding: 12px; border: 1px dashed var(--line); border-radius: 8px; background: #fbfdff; }
+        .offer-preview-box span { color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; }
+        .offer-preview-box strong { color: var(--blue); font-size: 17px; }
+        .offer-preview-box p { margin: 0; color: var(--muted); line-height: 1.5; }
+        .mini-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .icon-sample { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; background: rgba(15, 76, 129, 0.08); color: var(--blue); font-size: 18px; margin-right: 8px; }
+        .history-admin-layout { display: grid; gap: 18px; }
+        .history-preview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+        .history-thumb { min-height: 150px; border: 1px solid var(--line); border-radius: 8px; background: #eef2f6; overflow: hidden; display: grid; place-items: center; color: var(--muted); font-size: 13px; font-weight: 700; text-align: center; }
+        .history-thumb img, .history-thumb video { width: 100%; height: 150px; object-fit: cover; display: block; }
+        .history-thumb span { padding: 14px; }
+        .history-table-title { display: flex; align-items: flex-start; gap: 10px; }
+        .history-table-title i { color: var(--orange); margin-top: 3px; }
+
+        @media (max-width: 980px) {
+            .shell { grid-template-columns: 1fr; }
+            aside { position: relative; height: auto; }
+            .nav-tabs { grid-template-columns: repeat(2, 1fr); }
+            main { padding: 20px; }
+            .topline { flex-direction: column; align-items: flex-start; }
+            .metrics, .grid, .form-grid, .offer-admin-layout { grid-template-columns: 1fr; }
+            .history-preview-grid { grid-template-columns: 1fr; }
+            .full { grid-column: auto; }
+        }
+    </style>
+</head>
+<body class="auth-required">
+    <section class="auth-screen">
+        <div class="auth-card">
+            <img src="img/logo-azul.png" alt="REFRICAZ">
+            <h1 id="authTitle">Acceso administrador</h1>
+            <p id="authDescription">Ingresa con correo y contraseña para administrar el sitio.</p>
+            <form id="adminAuthForm">
+                <label id="authNameGroup">
+                    Nombre
+                    <input id="authName" type="text" placeholder="Nombre del administrador">
+                </label>
+                <label>
+                    Correo
+                    <input id="authEmail" type="email" required placeholder="admin@correo.com">
+                </label>
+                <label>
+                    Contraseña
+                    <input id="authPassword" type="password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                </label>
+                <div class="auth-actions">
+                    <button id="authSubmitBtn" class="primary" type="submit">Entrar</button>
+                    <a class="btn" href="index.html">Volver al sitio</a>
+                </div>
+            </form>
+            <div class="auth-help" id="authHelp"></div>
+        </div>
+    </section>
+
+    <div class="shell">
+        <aside>
+            <div class="brand">
+                <img src="img/logo-azul.png" alt="REFRICAZ">
+                <div>
+                    <strong>REFRICAZ</strong>
+                    <span>Panel administrativo</span>
+                </div>
+            </div>
+
+            <div class="session">
+                <strong id="sessionName">Administrador Local</strong>
+                <small id="sessionRole">admin</small>
+            </div>
+
+            <div class="nav-tabs">
+                <button class="tab-btn active" data-tab="resumen">Resumen</button>
+                <button class="tab-btn" data-tab="ofertas">Ofertas</button>
+                <button class="tab-btn" data-tab="historial">Historial</button>
+                <button class="tab-btn" data-tab="usuarios">Usuarios</button>
+                <button class="tab-btn" data-tab="comentarios">Comentarios</button>
+                <button class="tab-btn" data-tab="leads">Leads</button>
+            </div>
+
+            <div class="side-actions">
+                <a href="index.html">Volver al sitio</a>
+                <button id="exportBtn" type="button">Exportar datos</button>
+                <button id="adminLogoutBtn" type="button">Cerrar sesión</button>
+                <button id="clearBtn" type="button">Limpiar cache</button>
+            </div>
+        </aside>
+
+        <main>
+            <div class="topline">
+                <div>
+                    <h1>Control de Operación</h1>
+                    <div class="status" id="dataStatus">Conectando con Firebase</div>
+                </div>
+                <div class="toolbar">
+                    <label>
+                        Periodo
+                        <select id="periodSelect">
+                            <option value="week">Semana actual</option>
+                            <option value="month">Mes actual</option>
+                            <option value="year">Año actual</option>
+                            <option value="all">Histórico</option>
+                        </select>
+                    </label>
+                    <button id="refreshBtn" class="primary" type="button">Actualizar</button>
+                </div>
+            </div>
+
+            <section class="tab-panel active" id="tab-resumen">
+                <div class="metrics">
+                    <div class="metric"><span>Visitas página</span><strong id="metricViews">0</strong></div>
+                    <div class="metric"><span>WhatsApp directo</span><strong id="metricWhatsapp">0</strong></div>
+                    <div class="metric"><span>Chatbot</span><strong id="metricChat">0</strong></div>
+                    <div class="metric"><span>Formularios</span><strong id="metricForms">0</strong></div>
+                    <div class="metric"><span>Comentarios</span><strong id="metricComments">0</strong></div>
+                </div>
+
+                <div class="grid">
+                    <div class="panel">
+                        <h2>Actividad por fecha</h2>
+                        <canvas id="timelineChart"></canvas>
+                        <div class="empty" id="timelineFallback" style="display:none;">Chart.js no está disponible. Revisa las tablas para ver los datos.</div>
+                    </div>
+                    <div class="panel">
+                        <h2>Interacciones por canal</h2>
+                        <canvas id="pieChart"></canvas>
+                        <div class="empty" id="pieFallback" style="display:none;">Gráfica no disponible en este entorno.</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tab-panel" id="tab-ofertas">
+                <div class="panel" hidden aria-hidden="true">
+                    <h2>Oferta mensual automatica</h2>
+                    <p class="muted">Esta base cambia automaticamente segun el mes. El banner principal y los recuadros pueden usar estos datos o tener contenido propio.</p>
+                    <div class="form-grid">
+                        <label>
+                            Mes
+                            <select id="offerMonth"></select>
+                        </label>
+                        <label>
+                            Etiqueta
+                            <input id="offerLabel" type="text" placeholder="Ej. Junio express">
+                        </label>
+                        <label class="full">
+                            Título
+                            <input id="offerTitle" type="text" placeholder="Título de la oferta">
+                        </label>
+                        <label class="full">
+                            Descripción
+                            <textarea id="offerDescription" placeholder="Descripción de la oferta"></textarea>
+                        </label>
+                        <label>
+                            URL o ruta de imagen
+                            <input id="offerImage" type="text" placeholder="img/refrigerador.png">
+                        </label>
+                        <label>
+                            Subir imagen local
+                            <input id="offerFile" type="file" accept="image/*">
+                        </label>
+                        <label class="full">
+                            Texto alternativo
+                            <input id="offerAlt" type="text" placeholder="Descripción de la imagen">
+                        </label>
+                        <div>
+                            <img id="offerPreview" class="preview" src="img/refrigerador.png" alt="Vista previa">
+                        </div>
+                    </div>
+                    <div class="toolbar" style="margin-top:16px;">
+                        <button id="saveOfferBtn" class="primary" type="button">Guardar oferta</button>
+                        <button id="resetOffersBtn" type="button">Restaurar ofertas base</button>
+                    </div>
+                    <p class="muted">Las imagenes por URL o ruta del proyecto se guardan en Firebase. Para archivos grandes conviene activar Firebase Storage.</p>
+                </div>
+                <div class="panel">
+                    <h2>Banner principal visible en la pagina</h2>
+                    <p class="muted">Esto modifica la imagen grande y el texto de la seccion Ofertas de Temporada que aparece en la pagina inicial.</p>
+                    <div class="form-grid">
+                        <input id="bannerUseMonthly" type="hidden" value="">
+                        <label>
+                            Etiqueta del banner
+                            <input id="bannerLabel" type="text" placeholder="Ej. Junio express">
+                        </label>
+                        <label>
+                            Texto del boton
+                            <input id="bannerButton" type="text" placeholder="Solicitar ahora">
+                        </label>
+                        <label class="full">
+                            Titulo principal
+                            <input id="bannerTitle" type="text" placeholder="Servicio express para refrigeracion">
+                        </label>
+                        <label class="full">
+                            Descripcion
+                            <textarea id="bannerDescription" placeholder="Descripcion visible en el banner"></textarea>
+                        </label>
+                        <label>
+                            URL o ruta de imagen
+                            <input id="bannerImage" type="text" placeholder="img/ingenieros.jpg">
+                        </label>
+                        <label>
+                            Subir imagen local
+                            <input id="bannerFile" type="file" accept="image/*">
+                        </label>
+                        <label>
+                            Enlace del boton
+                            <input id="bannerLink" type="text" placeholder="#contacto">
+                        </label>
+                        <label>
+                            Texto alternativo
+                            <input id="bannerAlt" type="text" placeholder="Descripcion de la imagen">
+                        </label>
+                        <div class="offer-preview-box full">
+                            <span>Vista previa del banner</span>
+                            <img id="bannerPreview" class="preview" src="img/refrigerador.png" alt="Vista previa del banner">
+                            <strong id="bannerPreviewTitle">Especial Mes</strong>
+                            <p id="bannerPreviewText">15% de descuento en reparaciones generales este mes.</p>
+                        </div>
+                    </div>
+                    <div class="toolbar" style="margin-top:16px;">
+                        <button id="saveBannerBtn" class="primary" type="button">Guardar banner</button>
+                        <button id="resetBannerBtn" type="button">Restaurar banner base</button>
+                    </div>
+                    <p class="muted">Las imagenes por URL o ruta del proyecto se guardan en Firebase. Para archivos grandes conviene activar Firebase Storage.</p>
+                </div>
+
+                <div class="panel">
+                    <h2>Recuadros inferiores de ofertas</h2>
+                    <p class="muted">Desde aqui puedes agregar, editar, ocultar o borrar los recuadros que aparecen debajo del banner grande.</p>
+                    <div class="offer-admin-layout">
+                        <div>
+                            <input id="offerCardId" type="hidden">
+                            <div class="form-grid">
+                                <label class="full">
+                                    Titulo del recuadro
+                                    <input id="offerCardTitle" type="text" placeholder="Ej. Servicio express">
+                                </label>
+                                <label class="full">
+                                    Descripcion
+                                    <textarea id="offerCardDescription" placeholder="Texto corto de la oferta"></textarea>
+                                </label>
+                                <label class="full">
+                                    Icono
+                                    <select id="offerCardIcon">
+                                        <option value="fa-solid fa-percent">Porcentaje</option>
+                                        <option value="fa-solid fa-bolt">Rayo / express</option>
+                                        <option value="fa-solid fa-screwdriver-wrench">Herramientas</option>
+                                        <option value="fa-solid fa-calendar-check">Agenda</option>
+                                        <option value="fa-solid fa-shield-halved">Garantia</option>
+                                        <option value="fa-solid fa-snowflake">Refrigeracion</option>
+                                    </select>
+                                </label>
+                                <label class="check-row full">
+                                    <input id="offerCardVisible" type="checkbox" checked>
+                                    <span>Mostrar este recuadro en la pagina.</span>
+                                </label>
+                                <input id="offerCardUseMonthly" type="hidden" value="">
+                            </div>
+                            <div class="toolbar" style="margin-top:16px;">
+                                <button id="saveOfferCardBtn" class="primary" type="button">Guardar recuadro</button>
+                                <button id="newOfferCardBtn" type="button">Nuevo recuadro</button>
+                                <button id="resetOfferCardsBtn" type="button">Restaurar recuadros base</button>
+                            </div>
+                        </div>
+                        <div class="table-scroll">
+                            <table>
+                                <thead><tr><th>Recuadro</th><th>Estado</th><th>Acciones</th></tr></thead>
+                                <tbody id="offerCardsTable"></tbody>
+                            </table>
+                            <div class="empty" id="offerCardsEmpty">No hay recuadros configurados todavia.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tab-panel" id="tab-historial">
+                <div class="panel">
+                    <h2>Historial de servicios</h2>
+                    <p class="muted">Agrega trabajos reales para mostrarlos en el carrusel de antes y despues de la pagina principal. Puedes usar imagenes o un video corto.</p>
+                    <div class="history-admin-layout">
+                        <div class="history-admin-form">
+                            <input id="historyId" type="hidden">
+                            <div class="form-grid">
+                                <label>
+                                    Equipo o categoria
+                                    <input id="historyEquipment" type="text" placeholder="Ej. Refrigerador">
+                                </label>
+                                <label>
+                                    Titulo del trabajo
+                                    <input id="historyTitle" type="text" placeholder="Ej. Reparacion de sistema de enfriamiento">
+                                </label>
+                                <label class="full">
+                                    Descripcion
+                                    <textarea id="historyDescription" placeholder="Resume que se hizo y que resultado se logro."></textarea>
+                                </label>
+                                <label>
+                                    Imagen antes
+                                    <input id="historyBefore" type="text" placeholder="img/refrigerador.png">
+                                </label>
+                                <label>
+                                    Subir antes
+                                    <input id="historyBeforeFile" type="file" accept="image/*">
+                                </label>
+                                <label>
+                                    Imagen despues
+                                    <input id="historyAfter" type="text" placeholder="img/tecnico.jpg">
+                                </label>
+                                <label>
+                                    Subir despues
+                                    <input id="historyAfterFile" type="file" accept="image/*">
+                                </label>
+                                <label>
+                                    Video antes/despues
+                                    <input id="historyVideo" type="text" placeholder="URL o archivo de video">
+                                </label>
+                                <label>
+                                    Subir video
+                                    <input id="historyVideoFile" type="file" accept="video/*">
+                                </label>
+                                <label class="check-row full">
+                                    <input id="historyVisible" type="checkbox" checked>
+                                    <span>Mostrar este trabajo en la pagina.</span>
+                                </label>
+                            </div>
+                            <div class="history-preview-grid" style="margin-top:14px;">
+                                <div class="history-thumb" id="historyBeforePreview"><span>Vista antes</span></div>
+                                <div class="history-thumb" id="historyAfterPreview"><span>Vista despues</span></div>
+                                <div class="history-thumb" id="historyVideoPreview"><span>Vista video</span></div>
+                            </div>
+                            <div class="toolbar" style="margin-top:16px;">
+                                <button id="saveHistoryBtn" class="primary" type="button">Guardar trabajo</button>
+                                <button id="newHistoryBtn" type="button">Nuevo trabajo</button>
+                                <button id="resetHistoryBtn" type="button">Restaurar historial base</button>
+                            </div>
+                        </div>
+                        <div class="table-scroll">
+                            <table>
+                                <thead><tr><th>Trabajo</th><th>Medios</th><th>Estado</th><th>Acciones</th></tr></thead>
+                                <tbody id="historyTable"></tbody>
+                            </table>
+                            <div class="empty" id="historyEmpty">No hay trabajos configurados todavia.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tab-panel" id="tab-usuarios">
+                <div class="panel" style="display:none;">
+                    <h2>Crear usuario</h2>
+                    <div class="form-grid">
+                        <label>
+                            Nombre
+                            <input id="userName" type="text" placeholder="Nombre del usuario">
+                        </label>
+                        <label>
+                            Correo
+                            <input id="userEmail" type="email" placeholder="usuario@correo.com">
+                        </label>
+                        <label>
+                            Contraseña
+                            <input id="userPassword" type="password" minlength="6" placeholder="Crear contraseña">
+                        </label>
+                        <label>
+                            Rol
+                            <select id="userRole">
+                                <option value="user">Usuario normal</option>
+                                <option value="admin">Administrador</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="toolbar" style="margin-top:16px;">
+                        <button id="createUserBtn" class="primary" type="button">Crear usuario</button>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2>Usuarios y privilegios</h2>
+                    <p>Cada cuenta aparece aqui despues de registrarse o iniciar sesion en la pagina. Desde esta tabla puedes dar o quitar acceso de administrador.</p>
+                    <div class="table-scroll">
+                        <table>
+                            <thead><tr><th>Usuario</th><th>Rol</th><th>Creado</th><th>Acciones</th></tr></thead>
+                            <tbody id="usersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tab-panel" id="tab-comentarios">
+                <div class="panel">
+                    <h2>Moderación de comentarios</h2>
+                    <div class="table-scroll">
+                        <table>
+                            <thead><tr><th>Fecha</th><th>Usuario</th><th>Calificación</th><th>Comentario</th><th>Estado</th><th>Acciones</th></tr></thead>
+                            <tbody id="commentsTable"></tbody>
+                        </table>
+                        <div class="empty" id="commentsEmpty">No hay comentarios creados por usuarios todavía.</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tab-panel" id="tab-leads">
+                <div class="panel">
+                    <h2>Últimos registros</h2>
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr><th>Fecha</th><th>Origen</th><th>Contacto</th><th>Región</th><th>Servicio</th><th>Detalle</th></tr>
+                            </thead>
+                            <tbody id="leadsTable"></tbody>
+                        </table>
+                        <div class="empty" id="emptyState">Aun no hay registros en Firebase.</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="firebase-client.js?v=5"></script>
+    <script>
+        const STORAGE_LEADS_KEY = "refricaz_leads";
+        const STORAGE_ANALYTICS_KEY = "refricaz_analytics";
+        const STORAGE_OFFERS_KEY = "refricaz_offers";
+        const STORAGE_OFFER_BANNER_KEY = "refricaz_offer_banner";
+        const STORAGE_OFFER_CARDS_KEY = "refricaz_offer_cards";
+        const STORAGE_HISTORY_KEY = "refricaz_service_history";
+        const STORAGE_COMMENTS_KEY = "refricaz_comments";
+        const STORAGE_USERS_KEY = "refricaz_users";
+        const STORAGE_SESSION_USER_KEY = "refricaz_current_user";
+        let firebaseAdminProfile = null;
+        let firebaseAdminData = { leads: null, comments: null, users: null };
+        let firebaseAdminContent = null;
+
+        const MONTHS = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const BASE_OFFERS = [
+            { mes: 0, etiqueta: "Enero preventivo", titulo: "Arranca el año con equipos listos", descripcion: "Diagnóstico preferente en lavadoras y refrigeradores para evitar fallas después de vacaciones.", imagen: "img/tecnico.jpg", alt: "Técnico Refricaz revisando equipo" },
+            { mes: 1, etiqueta: "Febrero hogar", titulo: "Servicio para línea blanca esencial", descripcion: "Revisión de lavadora, secadora o refrigerador con atención prioritaria en zonas activas.", imagen: "img/lavadora.jpg", alt: "Lavadora moderna en servicio" },
+            { mes: 2, etiqueta: "Marzo mantenimiento", titulo: "Mantenimiento antes de temporada de calor", descripcion: "Limpieza y diagnóstico para refrigeradores con síntomas de bajo enfriamiento.", imagen: "img/refrigerador.png", alt: "Refrigerador para mantenimiento" },
+            { mes: 3, etiqueta: "Abril frío seguro", titulo: "Refrigeradores listos para el calor", descripcion: "Atención especial en fugas, sensores, empaques y carga de refrigerante.", imagen: "img/hero-bg.jpg", alt: "Servicio técnico especializado en refrigeración" },
+            { mes: 4, etiqueta: "Mayo mamá", titulo: "Lavadoras y centros de lavado al día", descripcion: "Revisión de ciclos, bombas y mantenimiento preventivo para uso intensivo en casa.", imagen: "img/centro-lavado.png", alt: "Centro de lavado" },
+            { mes: 5, etiqueta: "Junio express", titulo: "Servicio express para refrigeración", descripcion: "Prioridad en reportes de refrigeradores que no enfrían durante la temporada de calor.", imagen: "img/ingenieros.jpg", alt: "Ingenieros Refricaz listos para servicio" },
+            { mes: 6, etiqueta: "Julio técnico", titulo: "Diagnóstico especializado multimarca", descripcion: "Atención para LG, Samsung, Mabe, Whirlpool, Maytag, GE y Sub-Zero.", imagen: "img/tecnico.jpg", alt: "Técnico especializado Refricaz" },
+            { mes: 7, etiqueta: "Agosto regreso", titulo: "Equipos listos para la rutina", descripcion: "Mantenimiento de lavadoras y secadoras antes del regreso a clases.", imagen: "img/secadora.png", alt: "Secadora para mantenimiento" },
+            { mes: 8, etiqueta: "Septiembre seguro", titulo: "Garantía por escrito en reparaciones", descripcion: "Servicio técnico con refacciones originales y respaldo por escrito.", imagen: "img/ingenieros.jpg", alt: "Servicio técnico con garantía" },
+            { mes: 9, etiqueta: "Octubre preventivo", titulo: "Prevención de fallas eléctricas", descripcion: "Revisión de tarjetas electrónicas, sensores y sistemas de seguridad.", imagen: "img/microondas.png", alt: "Microondas para revisión técnica" },
+            { mes: 10, etiqueta: "Noviembre ofertas", titulo: "Buen fin de mantenimiento", descripcion: "Cotización preferente en reparaciones generales y mantenimiento preventivo.", imagen: "img/lavadora.jpg", alt: "Lavadora en promoción de mantenimiento" },
+            { mes: 11, etiqueta: "Diciembre hogar", titulo: "Equipos listos para reuniones", descripcion: "Atención prioritaria en refrigeradores, lavadoras y microondas antes de fiestas.", imagen: "img/hero-bg.jpg", alt: "Hogar con equipos listos para diciembre" }
+        ];
+
+        const BASE_BANNER = {
+            etiqueta: "Promocion vigente",
+            titulo: "Diagnostico con atencion preferente",
+            descripcion: "Cotiza tu reparacion o mantenimiento con respuesta rapida de un tecnico especializado.",
+            imagen: "img/refrigerador.png",
+            alt: "Promocion Refricaz",
+            boton: "Solicitar ahora",
+            enlace: "#contacto",
+            usarOfertaMensual: false
+        };
+
+        const BASE_OFFER_CARDS = [
+            {
+                id: "card-descuento",
+                icono: "fa-solid fa-percent",
+                titulo: "Revision con respuesta rapida",
+                descripcion: "Agenda tu diagnostico para refrigeradores, lavadoras, secadoras y camaras de refrigeracion.",
+                visible: true,
+                usarOfertaMensual: false
+            },
+            {
+                id: "card-express",
+                icono: "fa-solid fa-bolt",
+                titulo: "Servicio Express",
+                descripcion: "Atencion inmediata para emergencias en tu hogar.",
+                visible: true,
+                usarOfertaMensual: false
+            }
+        ];
+
+        const BASE_HISTORY = [
+            {
+                id: "hist-refrigerador",
+                titulo: "Refrigerador con falla de enfriamiento",
+                equipo: "Refrigerador",
+                descripcion: "Diagnostico, limpieza de sistema y verificacion de temperatura para recuperar el rendimiento del equipo.",
+                antes: "img/refrigerador.png",
+                despues: "img/ingenieros.jpg",
+                video: "",
+                visible: true
+            },
+            {
+                id: "hist-lavadora",
+                titulo: "Lavadora con mantenimiento correctivo",
+                equipo: "Lavadora",
+                descripcion: "Revision de componentes, ajuste de ciclo y prueba final de funcionamiento antes de entregar el servicio.",
+                antes: "img/lavadora.jpg",
+                despues: "img/tecnico.jpg",
+                video: "",
+                visible: true
+            },
+            {
+                id: "hist-centro-lavado",
+                titulo: "Centro de lavado puesto a punto",
+                equipo: "Centro de lavado",
+                descripcion: "Servicio integral para ciclos de lavado y secado, con pruebas de seguridad y operacion estable.",
+                antes: "img/centro-lavado.png",
+                despues: "img/secadora.png",
+                video: "",
+                visible: true
+            }
+        ];
+
+        let timelineChart;
+        let pieChart;
+
+        function readJSON(key, fallback = []) {
+            try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+            catch { return fallback; }
+        }
+
+        function writeJSON(key, value) {
+            localStorage.setItem(key, JSON.stringify(value));
+        }
+
+        function waitFirebaseClient(timeout = 6000) {
+            return new Promise((resolve) => {
+                if (window.refricazFirebase) {
+                    resolve(window.refricazFirebase);
+                    return;
+                }
+
+                const started = Date.now();
+                const timer = setInterval(() => {
+                    if (window.refricazFirebase) {
+                        clearInterval(timer);
+                        resolve(window.refricazFirebase);
+                    } else if (Date.now() - started > timeout) {
+                        clearInterval(timer);
+                        resolve(null);
+                    }
+                }, 100);
+            });
+        }
+
+        function getData(key, fallback = []) {
+            if (key === STORAGE_LEADS_KEY && Array.isArray(firebaseAdminData.leads)) return firebaseAdminData.leads;
+            if (key === STORAGE_COMMENTS_KEY && Array.isArray(firebaseAdminData.comments)) return firebaseAdminData.comments;
+            if (key === STORAGE_USERS_KEY && Array.isArray(firebaseAdminData.users)) return firebaseAdminData.users;
+            if (window.refricazFirebase) return fallback;
+            return readJSON(key, fallback);
+        }
+
+        async function loadFirebaseAdminData() {
+            const firebase = await waitFirebaseClient();
+            if (!firebase?.obtenerDatosAdmin || !firebaseAdminProfile) return;
+
+            const data = await firebase.obtenerDatosAdmin();
+            firebaseAdminData = {
+                leads: data.leads || [],
+                comments: data.comments || [],
+                users: data.users || []
+            };
+            firebaseAdminContent = data.siteContent || null;
+            loadOfferEditor();
+            loadBannerEditor();
+            renderOfferCardsAdmin();
+            renderHistoryAdmin();
+            document.getElementById("dataStatus").textContent = "Datos sincronizados con Firebase";
+        }
+
+        async function saveFirebaseContent(partial, successMessage) {
+            if (!window.refricazFirebase?.guardarContenidoSitio || !firebaseAdminProfile) {
+                notify("Inicia sesion como administrador para guardar en Firebase.");
+                return false;
+            }
+
+            const nextContent = { ...(firebaseAdminContent || {}), ...partial };
+
+            try {
+                await window.refricazFirebase.guardarContenidoSitio(partial);
+                firebaseAdminContent = nextContent;
+                notify(successMessage);
+                return true;
+            } catch (error) {
+                notify("No se pudo guardar el contenido en Firebase");
+                return false;
+            }
+        }
+
+        async function uploadAdminFile(file, folder, targetInputId, afterUpload) {
+            if (!file) return;
+
+            const allowed = file.type.startsWith("image/") || file.type.startsWith("video/");
+            if (!allowed) {
+                notify("Selecciona una imagen o video valido.");
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                notify("El archivo es muy grande. Usa uno menor a 10 MB.");
+                return;
+            }
+
+            if (!window.refricazFirebase?.subirArchivoSitio) {
+                notify("Firebase Storage no esta disponible todavia.");
+                return;
+            }
+
+            try {
+                notify("Subiendo archivo a Firebase Storage...");
+                const url = await window.refricazFirebase.subirArchivoSitio(file, folder);
+                document.getElementById(targetInputId).value = url;
+                if (typeof afterUpload === "function") afterUpload(url);
+                notify("Archivo subido correctamente");
+            } catch (error) {
+                notify("No se pudo subir. Activa Firebase Storage o revisa permisos.");
+                console.error(error);
+            }
+        }
+
+        function notify(message) {
+            document.querySelector(".notice")?.remove();
+            const box = document.createElement("div");
+            box.className = "notice";
+            box.textContent = message;
+            document.body.appendChild(box);
+            setTimeout(() => box.remove(), 3200);
+        }
+
+        function normalizeEmail(email) {
+            return String(email || "").trim().toLowerCase();
+        }
+
+        async function hashPassword(password) {
+            const text = String(password || "");
+            if (window.crypto?.subtle) {
+                const data = new TextEncoder().encode(text);
+                const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+                return Array.from(new Uint8Array(hashBuffer)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+            }
+            let hash = 0;
+            for (let i = 0; i < text.length; i++) {
+                hash = ((hash << 5) - hash) + text.charCodeAt(i);
+                hash |= 0;
+            }
+            return `fallback-${Math.abs(hash)}`;
+        }
+
+        function getCurrentUser() {
+            if (firebaseAdminProfile) return firebaseAdminProfile;
+            const users = readJSON(STORAGE_USERS_KEY, []);
+            const currentId = localStorage.getItem(STORAGE_SESSION_USER_KEY);
+            return users.find(user => user.id === currentId) || null;
+        }
+
+        function configureAuthScreen() {
+            const isSetup = false;
+            document.getElementById("authTitle").textContent = isSetup ? "Crear primer administrador" : "Acceso administrador";
+            document.getElementById("authDescription").textContent = isSetup ? "Crea la primera cuenta admin con correo y contraseña." : "Ingresa con una cuenta que tenga privilegios de administrador.";
+            document.getElementById("authSubmitBtn").textContent = isSetup ? "Crear administrador" : "Entrar";
+            document.getElementById("authNameGroup").style.display = "grid";
+            document.getElementById("authHelp").textContent = isSetup ? "Este paso solo aparece cuando no hay usuarios guardados en este navegador." : "Si no puedes entrar, pide a un administrador que te otorgue privilegios.";
+        }
+
+        function unlockAdmin(current) {
+            document.body.classList.remove("auth-required");
+            document.getElementById("sessionName").textContent = current.nombre;
+            document.getElementById("sessionRole").textContent = current.role;
+        }
+
+        function ensureAdmin() {
+            configureAuthScreen();
+            const current = getCurrentUser();
+            if (current?.role === "admin") {
+                unlockAdmin(current);
+                return true;
+            }
+            return false;
+        }
+
+        async function handleAdminAuth(event) {
+            event.preventDefault();
+            const firebase = await waitFirebaseClient();
+            const email = normalizeEmail(document.getElementById("authEmail").value);
+            const password = document.getElementById("authPassword").value;
+            const name = document.getElementById("authName").value.trim() || "Administrador";
+
+            if (!firebase?.iniciarSesionAdmin) {
+                notify("Firebase no cargo. Revisa tu conexion e intenta de nuevo.");
+                return;
+            }
+
+            try {
+                const user = await firebase.iniciarSesionAdmin(email, password, name);
+                firebaseAdminProfile = user;
+                localStorage.setItem(STORAGE_SESSION_USER_KEY, user.id);
+                unlockAdmin(user);
+                await loadFirebaseAdminData();
+                notify(`Bienvenido, ${user.nombre}`);
+                renderAll();
+            } catch (error) {
+                notify(error.message || "No se pudo iniciar sesion como administrador");
+            }
+            return;
+
+            if (isSetup) {
+                const name = document.getElementById("authName").value.trim() || "Administrador";
+                const admin = { id: `user-${Date.now()}`, nombre: name, email, passwordHash, role: "admin", createdAt: new Date().toISOString() };
+                writeJSON(STORAGE_USERS_KEY, [admin]);
+                localStorage.setItem(STORAGE_SESSION_USER_KEY, admin.id);
+                unlockAdmin(admin);
+                notify(`Administrador ${name} creado`);
+                renderAll();
+                return;
+            }
+
+            const user = users.find(item => item.email === email && item.passwordHash === passwordHash);
+            if (!user) {
+                notify("Correo o contraseña incorrectos");
+                return;
+            }
+            if (user.role !== "admin") {
+                notify("Tu usuario no tiene privilegios de administrador");
+                return;
+            }
+            localStorage.setItem(STORAGE_SESSION_USER_KEY, user.id);
+            unlockAdmin(user);
+            renderAll();
+        }
+
+        function getOffers() {
+            const remoteOffers = firebaseAdminContent?.offers;
+            if (Array.isArray(remoteOffers) && remoteOffers.length === 12) return remoteOffers.map(offer => ({ ...offer }));
+            if (window.refricazFirebase) return BASE_OFFERS.map(offer => ({ ...offer }));
+
+            const offers = readJSON(STORAGE_OFFERS_KEY, null);
+            return Array.isArray(offers) && offers.length === 12 ? offers : BASE_OFFERS;
+        }
+
+        function getMonthlyOffer(date = new Date()) {
+            return getOffers()[date.getMonth()] || BASE_OFFERS[date.getMonth()];
+        }
+
+        function getBannerConfig() {
+            const remoteBanner = firebaseAdminContent?.offerBanner;
+            if (remoteBanner && typeof remoteBanner === "object") return { ...BASE_BANNER, ...remoteBanner };
+            if (window.refricazFirebase) return { ...BASE_BANNER };
+
+            const saved = readJSON(STORAGE_OFFER_BANNER_KEY, null);
+            return saved && typeof saved === "object" ? { ...BASE_BANNER, ...saved } : { ...BASE_BANNER };
+        }
+
+        function getResolvedBannerConfig(date = new Date()) {
+            const banner = getBannerConfig();
+            return { ...banner, usarOfertaMensual: false };
+        }
+
+        function getOfferCards() {
+            const remoteCards = firebaseAdminContent?.offerCards;
+            if (Array.isArray(remoteCards)) return remoteCards.map(card => ({ ...card }));
+            if (window.refricazFirebase) return BASE_OFFER_CARDS.map(card => ({ ...card }));
+
+            const cards = readJSON(STORAGE_OFFER_CARDS_KEY, null);
+            const source = Array.isArray(cards) ? cards : BASE_OFFER_CARDS;
+            return source.map(card => ({ ...card }));
+        }
+
+        function getResolvedOfferCards(date = new Date()) {
+            return getOfferCards().map(card => ({ ...card, usarOfertaMensual: false }));
+        }
+
+        function dateInRange(iso, range) {
+            if (range === "all") return true;
+            const date = new Date(iso);
+            const now = new Date();
+            const start = new Date(now);
+            if (range === "week") {
+                const day = (now.getDay() + 6) % 7;
+                start.setDate(now.getDate() - day);
+                start.setHours(0,0,0,0);
+            }
+            if (range === "month") start.setFullYear(now.getFullYear(), now.getMonth(), 1), start.setHours(0,0,0,0);
+            if (range === "year") start.setFullYear(now.getFullYear(), 0, 1), start.setHours(0,0,0,0);
+            return date >= start;
+        }
+
+        function filterByPeriod(items) {
+            const period = document.getElementById("periodSelect").value;
+            return items.filter(item => dateInRange(item.createdAt, period));
+        }
+
+        function count(items, predicate) {
+            return items.filter(predicate).length;
+        }
+
+        function groupByDate(events) {
+            return events.reduce((acc, event) => {
+                const label = new Date(event.createdAt).toISOString().slice(0, 10);
+                acc[label] = (acc[label] || 0) + 1;
+                return acc;
+            }, {});
+        }
+
+        function renderChart(canvasId, existingChart, config, fallbackId) {
+            if (typeof Chart === "undefined") {
+                document.getElementById(canvasId).style.display = "none";
+                if (fallbackId) document.getElementById(fallbackId).style.display = "block";
+                return null;
+            }
+            if (existingChart) existingChart.destroy();
+            return new Chart(document.getElementById(canvasId), config);
+        }
+
+        function renderSummary() {
+            const leads = filterByPeriod(getData(STORAGE_LEADS_KEY, []));
+            const events = filterByPeriod(readJSON(STORAGE_ANALYTICS_KEY, []));
+            const comments = filterByPeriod(getData(STORAGE_COMMENTS_KEY, []));
+
+            document.getElementById("metricViews").textContent = count(events, event => event.type === "page_view");
+            document.getElementById("metricWhatsapp").textContent = count(events, event => event.type === "whatsapp_directo");
+            document.getElementById("metricChat").textContent = count(events, event => event.type === "chatbot_completado") || count(leads, lead => lead.origen === "chatbot");
+            document.getElementById("metricForms").textContent = count(events, event => event.type === "formulario_enviado") || count(leads, lead => lead.origen === "formulario" || lead.origen === "modal");
+            document.getElementById("metricComments").textContent = comments.length;
+            document.getElementById("dataStatus").textContent = `Firebase: ${leads.length} registros y ${comments.length} comentarios. Eventos locales: ${events.length}`;
+
+            const byDate = groupByDate(events);
+            const labels = Object.keys(byDate).sort();
+            timelineChart = renderChart("timelineChart", timelineChart, {
+                type: "bar",
+                data: { labels, datasets: [{ label: "Eventos", data: labels.map(label => byDate[label]), backgroundColor: "rgba(15, 76, 129, 0.82)", borderRadius: 7 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+            }, "timelineFallback");
+
+            const pieLabels = ["WhatsApp", "Chatbot", "Formularios", "Comentarios", "Secciones"];
+            const pieValues = [
+                count(events, event => event.type === "whatsapp_directo"),
+                count(events, event => event.type === "chatbot_completado"),
+                count(events, event => event.type === "formulario_enviado"),
+                count(events, event => event.type === "comentario_enviado"),
+                count(events, event => event.type === "section_view")
+            ];
+            pieChart = renderChart("pieChart", pieChart, {
+                type: "doughnut",
+                data: { labels: pieLabels, datasets: [{ data: pieValues, backgroundColor: ["#25D366", "#0f4c81", "#f26522", "#ffb800", "#6b7280"] }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "bottom" } } }
+            }, "pieFallback");
+        }
+
+        function fillOfferMonthSelect() {
+            const select = document.getElementById("offerMonth");
+            select.innerHTML = MONTHS.map((month, index) => `<option value="${index}">${month}</option>`).join("");
+        }
+
+        function loadOfferEditor() {
+            const index = Number(document.getElementById("offerMonth").value || 0);
+            const offer = getOffers()[index];
+            document.getElementById("offerLabel").value = offer.etiqueta;
+            document.getElementById("offerTitle").value = offer.titulo;
+            document.getElementById("offerDescription").value = offer.descripcion;
+            document.getElementById("offerImage").value = offer.imagen;
+            document.getElementById("offerAlt").value = offer.alt;
+            document.getElementById("offerPreview").src = offer.imagen;
+            document.getElementById("offerPreview").alt = offer.alt;
+        }
+
+        async function saveOffer() {
+            const index = Number(document.getElementById("offerMonth").value);
+            const offers = getOffers();
+            offers[index] = {
+                mes: index,
+                etiqueta: document.getElementById("offerLabel").value.trim(),
+                titulo: document.getElementById("offerTitle").value.trim(),
+                descripcion: document.getElementById("offerDescription").value.trim(),
+                imagen: document.getElementById("offerImage").value.trim(),
+                alt: document.getElementById("offerAlt").value.trim()
+            };
+            const saved = await saveFirebaseContent({ offers }, `Oferta de ${MONTHS[index]} actualizada`);
+            if (!saved && !window.refricazFirebase) writeJSON(STORAGE_OFFERS_KEY, offers);
+            updateBannerPreview();
+            renderOfferCardsAdmin();
+        }
+
+        function getBannerFormConfig() {
+            return {
+                etiqueta: document.getElementById("bannerLabel").value.trim() || BASE_BANNER.etiqueta,
+                titulo: document.getElementById("bannerTitle").value.trim() || BASE_BANNER.titulo,
+                descripcion: document.getElementById("bannerDescription").value.trim() || BASE_BANNER.descripcion,
+                imagen: document.getElementById("bannerImage").value.trim() || BASE_BANNER.imagen,
+                alt: document.getElementById("bannerAlt").value.trim() || BASE_BANNER.alt,
+                boton: document.getElementById("bannerButton").value.trim() || BASE_BANNER.boton,
+                enlace: document.getElementById("bannerLink").value.trim() || BASE_BANNER.enlace,
+                usarOfertaMensual: false
+            };
+        }
+
+        function resolveBannerConfig(config, date = new Date()) {
+            return { ...config, usarOfertaMensual: false };
+        }
+
+        function loadBannerEditor() {
+            const banner = getBannerConfig();
+            document.getElementById("bannerUseMonthly").checked = false;
+            document.getElementById("bannerLabel").value = banner.etiqueta;
+            document.getElementById("bannerTitle").value = banner.titulo;
+            document.getElementById("bannerDescription").value = banner.descripcion;
+            document.getElementById("bannerImage").value = banner.imagen;
+            document.getElementById("bannerAlt").value = banner.alt;
+            document.getElementById("bannerButton").value = banner.boton;
+            document.getElementById("bannerLink").value = banner.enlace;
+            updateBannerPreview();
+        }
+
+        function updateBannerPreview() {
+            const banner = resolveBannerConfig(getBannerFormConfig());
+            document.getElementById("bannerPreview").src = banner.imagen;
+            document.getElementById("bannerPreview").alt = banner.alt;
+            document.getElementById("bannerPreviewTitle").textContent = `${banner.etiqueta} - ${banner.titulo}`;
+            document.getElementById("bannerPreviewText").textContent = banner.descripcion;
+        }
+
+        async function saveBanner() {
+            const offerBanner = getBannerFormConfig();
+            const saved = await saveFirebaseContent({ offerBanner }, "Banner principal actualizado");
+            if (!saved && !window.refricazFirebase) writeJSON(STORAGE_OFFER_BANNER_KEY, offerBanner);
+            updateBannerPreview();
+        }
+
+        async function resetBanner() {
+            const saved = await saveFirebaseContent({ offerBanner: { ...BASE_BANNER } }, "Banner principal restaurado");
+            if (!saved && !window.refricazFirebase) localStorage.removeItem(STORAGE_OFFER_BANNER_KEY);
+            loadBannerEditor();
+        }
+
+        function newOfferCardEditor() {
+            document.getElementById("offerCardId").value = "";
+            document.getElementById("offerCardTitle").value = "";
+            document.getElementById("offerCardDescription").value = "";
+            document.getElementById("offerCardIcon").value = "fa-solid fa-percent";
+            document.getElementById("offerCardVisible").checked = true;
+            document.getElementById("offerCardUseMonthly").checked = false;
+        }
+
+        function loadOfferCardEditor(cardId) {
+            const card = getOfferCards().find(item => item.id === cardId);
+            if (!card) return newOfferCardEditor();
+            document.getElementById("offerCardId").value = card.id;
+            document.getElementById("offerCardTitle").value = card.titulo || "";
+            document.getElementById("offerCardDescription").value = card.descripcion || "";
+            document.getElementById("offerCardIcon").value = card.icono || "fa-solid fa-percent";
+            document.getElementById("offerCardVisible").checked = card.visible !== false;
+            document.getElementById("offerCardUseMonthly").checked = false;
+            notify("Recuadro cargado para editar");
+        }
+
+        async function saveOfferCard() {
+            const id = document.getElementById("offerCardId").value || `card-${Date.now()}`;
+            const usarOfertaMensual = false;
+            const titulo = document.getElementById("offerCardTitle").value.trim();
+            const descripcion = document.getElementById("offerCardDescription").value.trim();
+
+            if (!titulo || !descripcion) {
+                notify("Completa titulo y descripcion del recuadro");
+                return;
+            }
+
+            const cards = getOfferCards();
+            const nextCard = {
+                id,
+                icono: document.getElementById("offerCardIcon").value,
+                titulo,
+                descripcion,
+                visible: document.getElementById("offerCardVisible").checked,
+                usarOfertaMensual
+            };
+            const index = cards.findIndex(card => card.id === id);
+            if (index >= 0) {
+                cards[index] = nextCard;
+            } else {
+                cards.push(nextCard);
+            }
+            const saved = await saveFirebaseContent({ offerCards: cards }, "Recuadro de oferta guardado");
+            if (!saved && !window.refricazFirebase) writeJSON(STORAGE_OFFER_CARDS_KEY, cards);
+            renderOfferCardsAdmin();
+            loadOfferCardEditor(id);
+        }
+
+        async function toggleOfferCardVisibility(cardId) {
+            const cards = getOfferCards();
+            const card = cards.find(item => item.id === cardId);
+            if (!card) return;
+            card.visible = card.visible === false;
+            const saved = await saveFirebaseContent({ offerCards: cards }, card.visible ? "Recuadro visible en la pagina" : "Recuadro oculto en la pagina");
+            if (!saved && !window.refricazFirebase) writeJSON(STORAGE_OFFER_CARDS_KEY, cards);
+            renderOfferCardsAdmin();
+        }
+
+        async function deleteOfferCard(cardId) {
+            if (!confirm("Borrar este recuadro de ofertas?")) return;
+            const cards = getOfferCards().filter(card => card.id !== cardId);
+            const saved = await saveFirebaseContent({ offerCards: cards }, "Recuadro borrado");
+            if (!saved && !window.refricazFirebase) writeJSON(STORAGE_OFFER_CARDS_KEY, cards);
+            newOfferCardEditor();
+            renderOfferCardsAdmin();
+        }
+
+        async function resetOfferCards() {
+            const cards = BASE_OFFER_CARDS.map(card => ({ ...card }));
+            const saved = await saveFirebaseContent({ offerCards: cards }, "Recuadros base restaurados");
+            if (!saved && !window.refricazFirebase) localStorage.removeItem(STORAGE_OFFER_CARDS_KEY);
+            newOfferCardEditor();
+            renderOfferCardsAdmin();
+        }
+
+        function renderOfferCardsAdmin() {
+            const tbody = document.getElementById("offerCardsTable");
+            const empty = document.getElementById("offerCardsEmpty");
+            const rawCards = getOfferCards();
+            const resolvedCards = getResolvedOfferCards();
+            tbody.innerHTML = "";
+            empty.style.display = rawCards.length ? "none" : "block";
+
+            rawCards.forEach((card, index) => {
+                const resolved = resolvedCards[index] || card;
+                const row = document.createElement("tr");
+                const info = document.createElement("td");
+                const icon = document.createElement("span");
+                const iconNode = document.createElement("i");
+                const title = document.createElement("strong");
+                const description = document.createElement("small");
+                icon.className = "icon-sample";
+                iconNode.className = card.icono || "fa-solid fa-percent";
+                title.textContent = resolved.titulo || "Sin titulo";
+                description.textContent = resolved.descripcion || "Sin descripcion";
+                icon.appendChild(iconNode);
+                info.append(icon, title, description);
+
+                const status = document.createElement("td");
+                status.innerHTML = `<span class="tag ${card.visible === false ? "orange" : "green"}">${card.visible === false ? "Oculto" : "Visible"}</span>`;
+
+                const actionsCell = document.createElement("td");
+                const actions = document.createElement("div");
+                actions.className = "mini-actions";
+
+                const edit = document.createElement("button");
+                edit.type = "button";
+                edit.textContent = "Editar";
+                edit.addEventListener("click", () => loadOfferCardEditor(card.id));
+
+                const toggle = document.createElement("button");
+                toggle.type = "button";
+                toggle.textContent = card.visible === false ? "Mostrar" : "Ocultar";
+                toggle.addEventListener("click", () => toggleOfferCardVisibility(card.id));
+
+                const del = document.createElement("button");
+                del.type = "button";
+                del.className = "danger";
+                del.textContent = "Borrar";
+                del.addEventListener("click", () => deleteOfferCard(card.id));
+
+                actions.append(edit, toggle, del);
+                actionsCell.appendChild(actions);
+                row.append(info, status, actionsCell);
+                tbody.appendChild(row);
+            });
+        }
+
+        function getHistoryItems() {
+            const remoteItems = firebaseAdminContent?.serviceHistory;
+            if (Array.isArray(remoteItems)) return remoteItems.map(item => ({ ...item }));
+            if (window.refricazFirebase) return BASE_HISTORY.map(item => ({ ...item }));
+
+            const items = readJSON(STORAGE_HISTORY_KEY, null);
+            const source = Array.isArray(items) ? items : BASE_HISTORY;
+            return source.map(item => ({ ...item }));
+        }
+
+        function renderHistoryPreviewSlot(id, src, type = "image") {
+            const slot = document.getElementById(id);
+            if (!slot) return;
+            slot.innerHTML = "";
+            if (!src) {
+                const empty = document.createElement("span");
+                empty.textContent = id.includes("Video") ? "Vista video" : id.includes("Before") ? "Vista antes" : "Vista despues";
+                slot.appendChild(empty);
+                return;
+            }
+            if (type === "video") {
+                const video = document.createElement("video");
+                video.src = src;
+                video.controls = true;
+                video.preload = "metadata";
+                slot.appendChild(video);
+                return;
+            }
+            const img = document.createElement("img");
+            img.src = src;
+            img.alt = "Vista previa";
+            slot.appendChild(img);
+        }
+
+        function updateHistoryPreview() {
+            renderHistoryPreviewSlot("historyBeforePreview", document.getElementById("historyBefore").value.trim());
+            renderHistoryPreviewSlot("historyAfterPreview", document.getElementById("historyAfter").value.trim());
+            renderHistoryPreviewSlot("historyVideoPreview", document.getElementById("historyVideo").value.trim(), "video");
+        }
+
+        function newHistoryEditor() {
+            document.getElementById("historyId").value = "";
+            document.getElementById("historyEquipment").value = "";
+            document.getElementById("historyTitle").value = "";
+            document.getElementById("historyDescription").value = "";
+            document.getElementById("historyBefore").value = "";
+            document.getElementById("historyAfter").value = "";
+            document.getElementById("historyVideo").value = "";
+            document.getElementById("historyVisible").checked = true;
+            ["historyBeforeFile", "historyAfterFile", "historyVideoFile"].forEach(id => document.getElementById(id).value = "");
+            updateHistoryPreview();
+        }
+
+        function loadHistoryEditor(id) {
+            const item = getHistoryItems().find(entry => entry.id === id);
+            if (!item) return newHistoryEditor();
+            document.getElementById("historyId").value = item.id;
+            document.getElementById("historyEquipment").value = item.equipo || "";
+            document.getElementById("historyTitle").value = item.titulo || "";
+            document.getElementById("historyDescription").value = item.descripcion || "";
+            document.getElementById("historyBefore").value = item.antes || "";
+            document.getElementById("historyAfter").value = item.despues || "";
+            document.getElementById("historyVideo").value = item.video || "";
+            document.getElementById("historyVisible").checked = item.visible !== false;
+            updateHistoryPreview();
+            notify("Trabajo cargado para editar");
+        }
+
+        async function saveHistoryItem() {
+            const id = document.getElementById("historyId").value || `history-${Date.now()}`;
+            const equipo = document.getElementById("historyEquipment").value.trim();
+            const titulo = document.getElementById("historyTitle").value.trim();
+            const descripcion = document.getElementById("historyDescription").value.trim();
+            const antes = document.getElementById("historyBefore").value.trim();
+            const despues = document.getElementById("historyAfter").value.trim();
+            const video = document.getElementById("historyVideo").value.trim();
+
+            if (!equipo || !titulo || !descripcion) return notify("Completa equipo, titulo y descripcion");
+            if (!video && (!antes || !despues)) return notify("Agrega imagen antes y despues, o un video");
+
+            const items = getHistoryItems();
+            const nextItem = {
+                id,
+                equipo,
+                titulo,
+                descripcion,
+                antes,
+                despues,
+                video,
+                visible: document.getElementById("historyVisible").checked
+            };
+            const index = items.findIndex(item => item.id === id);
+            if (index >= 0) items[index] = nextItem;
+            else items.push(nextItem);
+            const saved = await saveFirebaseContent({ serviceHistory: items }, "Trabajo del historial guardado");
+            if (!saved && !window.refricazFirebase) writeJSON(STORAGE_HISTORY_KEY, items);
+            renderHistoryAdmin();
+            loadHistoryEditor(id);
+        }
+
+        async function toggleHistoryVisibility(id) {
+            const items = getHistoryItems();
+            const item = items.find(entry => entry.id === id);
+            if (!item) return;
+            item.visible = item.visible === false;
+            const saved = await saveFirebaseContent({ serviceHistory: items }, item.visible ? "Trabajo visible en la pagina" : "Trabajo oculto en la pagina");
+            if (!saved && !window.refricazFirebase) writeJSON(STORAGE_HISTORY_KEY, items);
+            renderHistoryAdmin();
+        }
+
+        async function deleteHistoryItem(id) {
+            if (!confirm("Borrar este trabajo del historial?")) return;
+            const items = getHistoryItems().filter(item => item.id !== id);
+            const saved = await saveFirebaseContent({ serviceHistory: items }, "Trabajo borrado");
+            if (!saved && !window.refricazFirebase) writeJSON(STORAGE_HISTORY_KEY, items);
+            newHistoryEditor();
+            renderHistoryAdmin();
+        }
+
+        async function resetHistoryItems() {
+            const items = BASE_HISTORY.map(item => ({ ...item }));
+            const saved = await saveFirebaseContent({ serviceHistory: items }, "Historial base restaurado");
+            if (!saved && !window.refricazFirebase) localStorage.removeItem(STORAGE_HISTORY_KEY);
+            newHistoryEditor();
+            renderHistoryAdmin();
+        }
+
+        function renderHistoryAdmin() {
+            const tbody = document.getElementById("historyTable");
+            const empty = document.getElementById("historyEmpty");
+            if (!tbody || !empty) return;
+            const items = getHistoryItems();
+            tbody.innerHTML = "";
+            empty.style.display = items.length ? "none" : "block";
+
+            items.forEach(item => {
+                const row = document.createElement("tr");
+                const info = document.createElement("td");
+                const titleWrap = document.createElement("div");
+                titleWrap.className = "history-table-title";
+                const icon = document.createElement("i");
+                icon.className = item.video ? "fa-solid fa-video" : "fa-solid fa-images";
+                const text = document.createElement("div");
+                const title = document.createElement("strong");
+                const description = document.createElement("small");
+                title.textContent = item.titulo || "Sin titulo";
+                description.textContent = item.descripcion || "Sin descripcion";
+                text.append(title, description);
+                titleWrap.append(icon, text);
+                info.appendChild(titleWrap);
+
+                const media = document.createElement("td");
+                media.innerHTML = `<span class="tag">${item.video ? "Video" : "Antes / despues"}</span><small>${item.equipo || "Servicio"}</small>`;
+
+                const status = document.createElement("td");
+                status.innerHTML = `<span class="tag ${item.visible === false ? "orange" : "green"}">${item.visible === false ? "Oculto" : "Visible"}</span>`;
+
+                const actionsCell = document.createElement("td");
+                const actions = document.createElement("div");
+                actions.className = "mini-actions";
+
+                const edit = document.createElement("button");
+                edit.type = "button";
+                edit.textContent = "Editar";
+                edit.addEventListener("click", () => loadHistoryEditor(item.id));
+
+                const toggle = document.createElement("button");
+                toggle.type = "button";
+                toggle.textContent = item.visible === false ? "Mostrar" : "Ocultar";
+                toggle.addEventListener("click", () => toggleHistoryVisibility(item.id));
+
+                const del = document.createElement("button");
+                del.type = "button";
+                del.className = "danger";
+                del.textContent = "Borrar";
+                del.addEventListener("click", () => deleteHistoryItem(item.id));
+
+                actions.append(edit, toggle, del);
+                actionsCell.appendChild(actions);
+                row.append(info, media, status, actionsCell);
+                tbody.appendChild(row);
+            });
+        }
+
+        function bindHistoryFileInput(fileId, targetId) {
+            document.getElementById(fileId).addEventListener("change", async event => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                const folder = fileId.includes("Video") ? "historial-videos" : "historial-imagenes";
+                await uploadAdminFile(file, folder, targetId, updateHistoryPreview);
+                event.target.value = "";
+            });
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById("usersTable");
+            const users = getData(STORAGE_USERS_KEY, []);
+            tbody.innerHTML = "";
+            users.forEach(user => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td><strong></strong><small></small></td><td></td><td></td><td></td>`;
+                row.querySelector("strong").textContent = user.nombre;
+                row.querySelector("small").textContent = user.email;
+                row.children[1].innerHTML = `<span class="tag ${user.role === "admin" ? "orange" : ""}">${user.role}</span>`;
+                row.children[2].textContent = new Date(user.createdAt).toLocaleDateString("es-MX");
+                const actions = document.createElement("div");
+                actions.className = "toolbar";
+                const toggle = document.createElement("button");
+                toggle.type = "button";
+                toggle.className = user.role === "admin" ? "danger" : "success";
+                toggle.textContent = user.role === "admin" ? "Quitar admin" : "Dar admin";
+                toggle.addEventListener("click", () => toggleAdmin(user.id));
+                const select = document.createElement("button");
+                select.type = "button";
+                select.textContent = "Usar sesión";
+                select.addEventListener("click", () => {
+                    localStorage.setItem(STORAGE_SESSION_USER_KEY, user.id);
+                    notify(`Sesión cambiada a ${user.nombre}`);
+                    setTimeout(() => location.reload(), 600);
+                });
+                actions.append(toggle);
+                row.children[3].appendChild(actions);
+                tbody.appendChild(row);
+            });
+        }
+
+        async function toggleAdmin(userId) {
+            const users = getData(STORAGE_USERS_KEY, []).slice();
+            const user = users.find(item => item.id === userId);
+            if (!user) return;
+            user.role = user.role === "admin" ? "user" : "admin";
+            if (window.refricazFirebase?.actualizarUsuario) {
+                try {
+                    await window.refricazFirebase.actualizarUsuario(user.uid || user.id, { role: user.role });
+                } catch (error) {
+                    notify("No se pudo actualizar el rol en Firebase");
+                    return;
+                }
+            }
+            firebaseAdminData.users = users;
+            notify(user.role === "admin" ? `Se dio privilegio de admin a ${user.nombre}` : `${user.nombre} ahora es usuario normal`);
+            renderUsers();
+        }
+
+        async function createUser() {
+            notify("Crea el usuario desde la pagina publica o Firebase Authentication; despues dale admin desde esta tabla.");
+            return;
+            const nombre = document.getElementById("userName").value.trim();
+            const email = normalizeEmail(document.getElementById("userEmail").value);
+            const password = document.getElementById("userPassword").value;
+            const role = document.getElementById("userRole").value;
+            if (!nombre || !email || password.length < 6) return notify("Completa nombre, correo y contraseña de mínimo 6 caracteres");
+            const users = readJSON(STORAGE_USERS_KEY, []);
+            if (users.some(user => user.email === email)) return notify("Ese correo ya está registrado");
+            users.push({ id: `user-${Date.now()}`, nombre, email, passwordHash: await hashPassword(password), role, createdAt: new Date().toISOString() });
+            writeJSON(STORAGE_USERS_KEY, users);
+            notify(role === "admin" ? `Se creó ${nombre} con privilegios de admin` : `Usuario ${nombre} creado`);
+            document.getElementById("userName").value = "";
+            document.getElementById("userEmail").value = "";
+            document.getElementById("userPassword").value = "";
+            renderUsers();
+        }
+
+        function renderComments() {
+            const tbody = document.getElementById("commentsTable");
+            const empty = document.getElementById("commentsEmpty");
+            const comments = getData(STORAGE_COMMENTS_KEY, []);
+            tbody.innerHTML = "";
+            empty.style.display = comments.length ? "none" : "block";
+            comments.forEach(comment => {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td></td><td></td><td></td><td></td><td></td><td></td>`;
+                row.children[0].textContent = new Date(comment.createdAt).toLocaleString("es-MX");
+                row.children[1].textContent = comment.usuario;
+                row.children[2].textContent = `${comment.estrellas}/5`;
+                row.children[3].textContent = comment.texto;
+                row.children[4].innerHTML = `<span class="tag ${comment.hidden ? "orange" : "green"}">${comment.hidden ? "Oculto" : "Visible"}</span>`;
+                const actions = document.createElement("div");
+                actions.className = "toolbar";
+                const toggle = document.createElement("button");
+                toggle.type = "button";
+                toggle.textContent = comment.hidden ? "Mostrar" : "Ocultar";
+                toggle.addEventListener("click", () => toggleComment(comment.id));
+                const del = document.createElement("button");
+                del.type = "button";
+                del.className = "danger";
+                del.textContent = "Borrar";
+                del.addEventListener("click", () => deleteComment(comment.id));
+                actions.append(toggle, del);
+                row.children[5].appendChild(actions);
+                tbody.appendChild(row);
+            });
+        }
+
+        async function toggleComment(id) {
+            const comments = getData(STORAGE_COMMENTS_KEY, []).slice();
+            const comment = comments.find(item => item.id === id);
+            if (!comment) return;
+            comment.hidden = !comment.hidden;
+            if (window.refricazFirebase?.actualizarComentario) {
+                try {
+                    await window.refricazFirebase.actualizarComentario(comment.id, { hidden: comment.hidden });
+                } catch (error) {
+                    notify("No se pudo actualizar el comentario en Firebase");
+                    return;
+                }
+            }
+            firebaseAdminData.comments = comments;
+            notify(comment.hidden ? "Comentario oculto" : "Comentario visible");
+            renderComments();
+        }
+
+        async function deleteComment(id) {
+            if (!confirm("¿Borrar este comentario del registro local?")) return;
+            if (window.refricazFirebase?.eliminarComentario) {
+                try {
+                    await window.refricazFirebase.eliminarComentario(id);
+                } catch (error) {
+                    notify("No se pudo borrar el comentario en Firebase");
+                    return;
+                }
+            }
+            const comments = getData(STORAGE_COMMENTS_KEY, []).filter(comment => comment.id !== id);
+            firebaseAdminData.comments = comments;
+            notify("Comentario borrado");
+            renderComments();
+        }
+
+        function renderLeads() {
+            const tbody = document.getElementById("leadsTable");
+            const empty = document.getElementById("emptyState");
+            const leads = getData(STORAGE_LEADS_KEY, []);
+            tbody.innerHTML = "";
+            empty.style.display = leads.length ? "none" : "block";
+            leads.slice(0, 100).forEach(lead => {
+                const row = document.createElement("tr");
+                const nombre = lead.nombre || lead.Nombre || "Sin nombre";
+                const telefono = lead.telefono || lead.Telefono || "";
+                const correo = lead.email || lead.Email || "";
+                const servicio = lead.equipo || lead.Tipo_De_Servicio || lead.servicio || "Servicio";
+                const detalle = lead.falla || lead.Mensaje || lead.Detalle || "";
+                row.innerHTML = `<td></td><td><span class="tag ${lead.origen === "chatbot" ? "orange" : ""}"></span></td><td><strong></strong><small></small><small></small></td><td></td><td></td><td></td>`;
+                row.children[0].textContent = new Date(lead.createdAt).toLocaleString("es-MX");
+                row.querySelector(".tag").textContent = lead.origen || "web";
+                row.querySelector("strong").textContent = nombre;
+                row.querySelectorAll("small")[0].textContent = telefono;
+                row.querySelectorAll("small")[1].textContent = correo;
+                row.children[3].textContent = lead.region || "Sin dato";
+                row.children[4].textContent = servicio;
+                row.children[5].textContent = detalle;
+                tbody.appendChild(row);
+            });
+        }
+
+        function renderAll() {
+            renderSummary();
+            renderOfferCardsAdmin();
+            renderHistoryAdmin();
+            renderUsers();
+            renderComments();
+            renderLeads();
+        }
+
+        document.querySelectorAll(".tab-btn").forEach(button => {
+            button.addEventListener("click", () => {
+                document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+                document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
+                button.classList.add("active");
+                document.getElementById(`tab-${button.dataset.tab}`).classList.add("active");
+            });
+        });
+
+        document.getElementById("periodSelect").addEventListener("change", renderSummary);
+        document.getElementById("refreshBtn").addEventListener("click", async () => {
+            await loadFirebaseAdminData();
+            renderAll();
+        });
+        document.getElementById("offerMonth").addEventListener("change", loadOfferEditor);
+        document.getElementById("offerImage").addEventListener("input", () => document.getElementById("offerPreview").src = document.getElementById("offerImage").value);
+        document.getElementById("offerFile").addEventListener("change", async (event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            await uploadAdminFile(file, "ofertas", "offerImage", (url) => {
+                document.getElementById("offerPreview").src = url;
+            });
+            event.target.value = "";
+        });
+        document.getElementById("saveOfferBtn").addEventListener("click", saveOffer);
+        document.getElementById("resetOffersBtn").addEventListener("click", async () => {
+            const offers = BASE_OFFERS.map(offer => ({ ...offer }));
+            const saved = await saveFirebaseContent({ offers }, "Ofertas base restauradas");
+            if (!saved && !window.refricazFirebase) localStorage.removeItem(STORAGE_OFFERS_KEY);
+            loadOfferEditor();
+            updateBannerPreview();
+            renderOfferCardsAdmin();
+        });
+        ["bannerUseMonthly", "bannerLabel", "bannerTitle", "bannerDescription", "bannerImage", "bannerAlt", "bannerButton", "bannerLink"].forEach(id => {
+            const eventName = document.getElementById(id).type === "checkbox" ? "change" : "input";
+            document.getElementById(id).addEventListener(eventName, updateBannerPreview);
+        });
+        document.getElementById("bannerFile").addEventListener("change", async (event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            await uploadAdminFile(file, "banner", "bannerImage", updateBannerPreview);
+            event.target.value = "";
+        });
+        document.getElementById("saveBannerBtn").addEventListener("click", saveBanner);
+        document.getElementById("resetBannerBtn").addEventListener("click", resetBanner);
+        document.getElementById("saveOfferCardBtn").addEventListener("click", saveOfferCard);
+        document.getElementById("newOfferCardBtn").addEventListener("click", newOfferCardEditor);
+        document.getElementById("resetOfferCardsBtn").addEventListener("click", resetOfferCards);
+        ["historyBefore", "historyAfter", "historyVideo"].forEach(id => {
+            document.getElementById(id).addEventListener("input", updateHistoryPreview);
+        });
+        bindHistoryFileInput("historyBeforeFile", "historyBefore");
+        bindHistoryFileInput("historyAfterFile", "historyAfter");
+        bindHistoryFileInput("historyVideoFile", "historyVideo");
+        document.getElementById("saveHistoryBtn").addEventListener("click", saveHistoryItem);
+        document.getElementById("newHistoryBtn").addEventListener("click", newHistoryEditor);
+        document.getElementById("resetHistoryBtn").addEventListener("click", resetHistoryItems);
+        document.getElementById("createUserBtn").addEventListener("click", createUser);
+        document.getElementById("adminAuthForm").addEventListener("submit", handleAdminAuth);
+        document.getElementById("adminLogoutBtn").addEventListener("click", async () => {
+            if (window.refricazFirebase?.cerrarSesionFirebase) {
+                await window.refricazFirebase.cerrarSesionFirebase().catch(() => {});
+            }
+            localStorage.removeItem(STORAGE_SESSION_USER_KEY);
+            location.reload();
+        });
+        document.getElementById("exportBtn").addEventListener("click", () => {
+            const payload = {
+                leads: getData(STORAGE_LEADS_KEY, []),
+                analytics: readJSON(STORAGE_ANALYTICS_KEY, []),
+                offers: getOffers(),
+                offerBanner: getBannerConfig(),
+                offerCards: getOfferCards(),
+                serviceHistory: getHistoryItems(),
+                comments: getData(STORAGE_COMMENTS_KEY, []),
+                users: getData(STORAGE_USERS_KEY, [])
+            };
+            const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `refricaz-admin-${new Date().toISOString().slice(0, 10)}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        });
+        document.getElementById("clearBtn").addEventListener("click", () => {
+            if (!confirm("¿Limpiar datos demo locales? Esto borra leads, eventos, comentarios, usuarios, ofertas e historial guardados en este navegador.")) return;
+            [STORAGE_LEADS_KEY, STORAGE_ANALYTICS_KEY, STORAGE_OFFERS_KEY, STORAGE_OFFER_BANNER_KEY, STORAGE_OFFER_CARDS_KEY, STORAGE_HISTORY_KEY, STORAGE_COMMENTS_KEY, STORAGE_USERS_KEY, STORAGE_SESSION_USER_KEY].forEach(key => localStorage.removeItem(key));
+            location.reload();
+        });
+
+        fillOfferMonthSelect();
+        loadOfferEditor();
+        loadBannerEditor();
+        newOfferCardEditor();
+        newHistoryEditor();
+        renderOfferCardsAdmin();
+        renderHistoryAdmin();
+
+        async function initAdminPanel() {
+            configureAuthScreen();
+            const firebase = await waitFirebaseClient();
+            if (!firebase?.observarSesion) {
+                ensureAdmin();
+                return;
+            }
+
+            firebase.observarSesion(async (user) => {
+                if (user?.role === "admin") {
+                    firebaseAdminProfile = user;
+                    unlockAdmin(user);
+                    await loadFirebaseAdminData();
+                    renderAll();
+                } else if (!user) {
+                    configureAuthScreen();
+                }
+            });
+        }
+
+        initAdminPanel();
+    </script>
+</body>
+</html>
