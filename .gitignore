@@ -5,3 +5,7 @@ node_modules/
 .vercel/
 firebase-service-account*.json
 *.log
+
+
+backend/config/firebase-service-account.json
+backend/.env
